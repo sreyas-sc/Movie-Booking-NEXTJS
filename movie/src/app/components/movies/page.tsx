@@ -64,6 +64,12 @@ const MoviePage = () => {
     <MenuItem value="">All Genres</MenuItem>
     <MenuItem value="Action">Action</MenuItem>
     <MenuItem value="Comedy">Comedy</MenuItem>
+    <MenuItem value="Fantasy">Fantasy</MenuItem>
+    <MenuItem value="Romance">Romance</MenuItem>
+    <MenuItem value="Fiction">Fiction</MenuItem>
+    <MenuItem value="Thriller">Thriller</MenuItem>
+    <MenuItem value="Horror">Horror</MenuItem>
+    <MenuItem value="Fantasy">Fnatasy</MenuItem>
     {/* Add more genres as needed */}
   </Select>
 
@@ -76,14 +82,14 @@ const MoviePage = () => {
     InputProps={{ inputProps: { min: 0, max: 10 } }}
   />
 
-  <TextField
+  {/* <TextField
   fullWidth
     type="text"
     label="Showtime"
     value={showtime}
     onChange={(e) => setShowtime(e.target.value)}
     placeholder="e.g., 7:00 PM"
-  />
+  /> */}
 
 
   <Button variant="contained" 

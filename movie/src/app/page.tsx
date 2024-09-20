@@ -71,9 +71,9 @@ export default function Homepage() {
 
     // carousel starts here
     const images = [
-      "https://assets-in.bmscdn.com/iedb/movies/images/mobile/listing/xxlarge/deadpool-and-wolverine-et00341295-1718018322.jpg",
-      "https://media.themoviedb.org/t/p/w1000_and_h563_face/stKGOm8UyhuLPR9sZLjs5AkmncA.jpg",
-      "https://media.themoviedb.org/t/p/w1066_and_h600_bestv2/2RVcJbWFmICRDsVxRI8F5xRmRsK.jpg",
+      "https://image.tmdb.org/t/p/original/xrCYSgZ7hMF7CkDl3MWhRg8eR6q.jpg",
+      "https://image.tmdb.org/t/p/original/v9acaWVVFdZT5yAU7J2QjwfhXyD.jpg",
+      "https://image.tmdb.org/t/p/original/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg",
     ];
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -128,7 +128,7 @@ export default function Homepage() {
       alignItems="center"
     >
       {/* Image Display */}
-      <Box margin="auto" width={"90%"} height={"400px"} position="relative">
+      <Box margin="auto" width={"90%"} height={"500px"} position="relative">
         <img
           src={images[currentImageIndex]}
           alt="Carousel Image"
@@ -248,10 +248,21 @@ export default function Homepage() {
       <Grid container spacing={4} justifyContent="center" paddingX={5} flexWrap="wrap">
   {upcomingMovies.map((movie) => (
     <Grid item xs={12} sm={6} md={4} key={movie.id}>
-      <Card sx={{ maxWidth: 345, cursor: 'pointer' }} onClick={() => console.log(movie.id)}>
+      <Card sx={{
+        width: 500,
+        height: 650,
+        borderRadius: 5,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        transition: '0.3s',
+        '&:hover': {
+          boxShadow: "10px 10px 20px #ccc"
+        }
+      }} onClick={() => console.log(movie.id)}>
         <CardMedia
           component="img"
-          height="300"
+          height="450"
           image={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
           alt={movie.title}
         />
