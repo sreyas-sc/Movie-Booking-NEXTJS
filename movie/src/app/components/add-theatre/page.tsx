@@ -5,6 +5,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { addTheater, getAllMovies, getAllTheatres } from '@/app/api-helpers/api-helpers';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 type ShowTime = { time: string };
 
@@ -84,6 +85,15 @@ const AddTheater = () => {
         setTheaters((prev) => [...prev, res]);
         setFilteredTheaters((prev) => [...prev, res]);
         setError('');
+        Swal.fire({
+          title: 'Theater Added!',
+          text: 'The theater has been successfully added.',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          // Call the function to show all theaters
+          getAllTheatres(); // Ensure this function fetches and updates the theater list
+        });
       })
       .catch((err) => {
         console.error('Error adding theater:', err);
@@ -97,11 +107,12 @@ const AddTheater = () => {
 
   useEffect(() => {
     const filtered = theaters.filter(theater =>
-      theater.name.toLowerCase().includes(search.name.toLowerCase()) &&
-      theater.location.toLowerCase().includes(search.location.toLowerCase())
+      (theater.name && theater.name.toLowerCase().includes(search.name?.toLowerCase() || '')) &&
+      (theater.location && theater.location.toLowerCase().includes(search.location?.toLowerCase() || ''))
     );
     setFilteredTheaters(filtered);
-  }, [search, theaters]);
+  }, [theaters, search]);
+  
 
   // const handleAddShows = (theater: Theater) => {
   //   // Save theater data to localStorage

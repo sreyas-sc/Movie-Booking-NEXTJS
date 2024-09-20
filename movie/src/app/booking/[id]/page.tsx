@@ -1,6 +1,6 @@
 'use client';
 import React, { Fragment, useEffect, useState } from 'react';
-import { Box, TextField, Typography, Card, CardContent, Divider, Button } from '@mui/material';
+import { Box, TextField, Typography, Card, CardContent, Divider, Button, CardMedia } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { getMovieDetails, getAllShows } from '@/app/api-helpers/api-helpers.js';
 import { useRouter } from 'next/navigation'; // Correct import
@@ -160,35 +160,31 @@ const Booking: React.FC = () => {
               marginLeft={'50px'}
               marginRight={'auto'}
             >
-              {/* The poster image of the movie */}
-              <img
-                width='60%'
-                height='auto'
-                src={movie.posterUrl}
+              {/* The poster image of the movie using CardMedia */}
+                <CardMedia
+                component="img"
+                height={"50%"} // Keep this to set the height
+                image={movie.posterUrl ? `http://localhost:5000/uploads/${movie.posterUrl.split('\\').pop()}` : ''}
                 alt={movie.title}
+                sx={{ width: '50%', maxWidth: '50%', objectFit: 'cover' }} // Adjust width and maintain aspect ratio
               />
+
             </Box>
-            <Box
-              width='40%'
-              marginLeft={3}
-            >
+            <Box width='40%' marginLeft={3}>
               {/* Movie details card */}
-              <Card variant="outlined"
-                elevation={3} sx={{ 
-                  width: 300, 
-                  // height: ,
-                  minHeight: '600',
-                  borderRadius: 5, 
-                  borderBlockColor:  '#e51022',
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  justifyContent: 'space-between', // Ensure the content and button are spaced
-                  ":hover": {
-                    borderColor: "red",
-                    // backgroundColor: "#f0f0f0",
-                    boxShadow: "10px 10px 20px #ccc"
-                  }
-                }}>
+              <Card variant="outlined" elevation={3} sx={{ 
+                width: 300, 
+                minHeight: 600,
+                borderRadius: 5, 
+                borderBlockColor:  '#e51022',
+                display: 'flex', 
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                ":hover": {
+                  borderColor: "red",
+                  boxShadow: "10px 10px 20px #ccc"
+                }
+              }}>
                 <CardContent>
                   <Typography variant="h5" component="div">
                     {movie.title}
@@ -204,13 +200,12 @@ const Booking: React.FC = () => {
                     IMDB Rating: {movie.rating} ⭐
                   </Typography>
                   <Typography variant="body2" fontWeight={'bold'} mt={2}>
-                    Staring : 🎭 {movie.cast} 
+                    Starring: 🎭 {movie.cast} 
                   </Typography>
                 </CardContent>
               </Card>
             </Box>
           </Box>
-
           {/* Theater Cards */}
           <Box display={'flex'} flexDirection={'column'} padding={3}>
             {Object.entries(groupedShows).map(([theaterKey, shows]) => (

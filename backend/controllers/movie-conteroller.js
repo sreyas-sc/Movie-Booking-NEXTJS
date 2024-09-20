@@ -13,65 +13,118 @@ import jwt from 'jsonwebtoken';
 // Promisify jwt.verify
 const verifyToken = promisify(jwt.verify);
 
+// export const addMovie = async (req, res) => {
+  
+//   try {
+//       const extractedToken = req.headers.authorization?.split(" ")[1];
+//       if (!extractedToken) {
+//           return res.status(404).json({ message: "Token not found" });
+//       }
+
+//       let adminId;
+//       try {
+//           const decoded = await verifyToken(extractedToken, 'MYSECRETKEY');
+//           adminId = decoded.id;
+//       } catch (err) {
+//           return res.status(400).json({ message: err.message });
+//       }
+
+//         // Destructure fields from the request body
+//       const { title, description, releaseDate, duration, featured, genre, rating, cast } = req.body;
+
+//        // Get uploaded file URLs
+//        const posterUrl = req.file ? req.file.path : null; // Path to the poster
+//        const castPhotos = req.files && req.files.castPhotos ? req.files.castPhotos.map(file => file.path) : []; // Paths to cast photos
+
+      
+//       if (!title || !description || !duration) {
+//           return res.status(402).json({ message: "Invalid inputs!" });
+//       }
+//       const parsedCast = Array.isArray(cast) ? cast : JSON.parse(cast || '[]');
+
+//       let movie = new Movie({
+//           title,
+//           description,
+//           releaseDate: new Date(releaseDate),
+//           posterUrl,
+//           duration,
+//           featured,
+//           admin: adminId,
+//           genre,
+//           rating,
+//           cast : parsedCast
+
+//       });
+
+//       const session = await mongoose.startSession();
+//       session.startTransaction();
+//       await movie.save({ session });
+//       const adminUser = await Admin.findById(adminId);
+//       adminUser.addedMovies.push(movie);
+//       await adminUser.save({ session });
+
+//       await session.commitTransaction();
+//       return res.status(201).json({ movie });
+//   } catch (err) {
+//       console.error("Error during movie addition:", err);
+//       return res.status(500).json({ message: "Movie creation failed" });
+//   }
+// };
 export const addMovie = async (req, res) => {
-  const {title}=  req.body;
-  console.log("title is", title)
+  try {
+      const extractedToken = req.headers.authorization?.split(" ")[1];
+      if (!extractedToken) {
+          return res.status(404).json({ message: "Token not found" });
+      }
 
-console.log("req body 2 is", req.body)
-    try {
-        const extractedToken = req.headers.authorization?.split(" ")[1];
-        if (!extractedToken) {
-            return res.status(404).json({ message: "Token not found" });
-        }
+      let adminId;
+      try {
+          const decoded = await verifyToken(extractedToken, 'MYSECRETKEY');
+          adminId = decoded.id;
+      } catch (err) {
+          return res.status(400).json({ message: err.message });
+      }
 
-        let adminId;
-        try {
-            const decoded = await verifyToken(extractedToken, 'MYSECRETKEY');
-            adminId = decoded.id;
-        } catch (err) {
-            return res.status(400).json({ message: err.message });
-        }
+      // Destructure fields from the request body
+      const { title, description, releaseDate, duration, featured, genre, rating, cast } = req.body;
 
-        console.log("req body is", req.body)
-        const { title, description, releaseDate, duration, featured, genre, rating, posterUrl, cast } = req.body;
-        // const posterUrl = req.file?.path;
+      // Get uploaded file URLs
+      const posterUrl = req.files.poster ? req.files.poster[0].path : null; // Path to the poster
+      const castPhotos = req.files.castPhotos ? req.files.castPhotos.map(file => file.path) : []; // Paths to cast photos
 
-        console.log(title,  description, duration);
+      if (!title || !description || !duration || !posterUrl) {
+          return res.status(400).json({ message: "Invalid inputs! Poster image is required." });
+      }
 
-        if (!title || !description || !duration) {
-            return res.status(402).json({ message: "Invalid inputs!" });
-        }
-        const parsedCast = Array.isArray(cast) ? cast : JSON.parse(cast || '[]');
+      const parsedCast = Array.isArray(cast) ? cast : JSON.parse(cast || '[]');
 
-        let movie = new Movie({
-            title,
-            description,
-            releaseDate: new Date(releaseDate),
-            posterUrl,
-            duration,
-            featured,
-            admin: adminId,
-            genre,
-            rating,
-            cast : parsedCast
+      let movie = new Movie({
+          title,
+          description,
+          releaseDate: new Date(releaseDate),
+          posterUrl,
+          duration,
+          featured,
+          admin: adminId,
+          genre,
+          rating,
+          cast: parsedCast
+      });
 
-        });
+      const session = await mongoose.startSession();
+      session.startTransaction();
+      await movie.save({ session });
+      const adminUser = await Admin.findById(adminId);
+      adminUser.addedMovies.push(movie);
+      await adminUser.save({ session });
 
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        await movie.save({ session });
-        const adminUser = await Admin.findById(adminId);
-        adminUser.addedMovies.push(movie);
-        await adminUser.save({ session });
-
-        await session.commitTransaction();
-        return res.status(201).json({ movie });
-    } catch (err) {
-        console.error("Error during movie addition:", err);
-        return res.status(500).json({ message: "Movie creation failed" });
-    }
+      await session.commitTransaction();
+      return res.status(201).json({ movie });
+  } catch (err) {
+      console.error("Error during movie addition:", err);
+      return res.status(500).json({ message: "Movie creation failed" });
+  }
 };
-
 
 export const getAllMovies = async (req, res, next) => {
     const { genre, rating, showtime } = req.query;

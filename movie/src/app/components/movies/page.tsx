@@ -41,7 +41,7 @@ const MoviePage = () => {
     getAllMovies(filters)
       .then((data) => {
         if (data && data.movies) {
-          console.log(data.movies)
+          console.log("Fetched movies:", data.movies); // Log the fetched movies
           setMovies(data.movies);
         }
       })
