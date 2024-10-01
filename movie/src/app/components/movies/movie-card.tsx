@@ -117,7 +117,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
 
   // Simplified image URL handling with a fallback
   const imageUrl = posterUrl 
-    ? `http://localhost:5000/uploads/${posterUrl.split('\\').pop()}` 
+    ? `https://movie-booking-nextjs.onrender.com/uploads/${posterUrl.split('\\').pop()}` 
     : '/default-image.jpg';
 
 
