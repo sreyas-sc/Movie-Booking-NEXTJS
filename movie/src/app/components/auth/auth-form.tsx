@@ -15,6 +15,15 @@ import { googleSignIn } from "@/app/api-helpers/api-helpers";
 import { useDispatch } from 'react-redux';
 import { userActions } from '@/app/store';
 
+
+interface CredentialResponse {
+  credential?: string;
+}
+
+interface DecodedToken {
+  email: string;
+}
+
 interface AuthFormProps {
   onSubmit: (inputs: { email: string; phone: string; password: string; signup: boolean }) => void;
   isAdmin: boolean;
@@ -33,6 +42,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
   });
   const dispatch =  useDispatch();
 
+
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -47,10 +58,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
   };
 
   
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     const credential = credentialResponse?.credential;
     if (credential) {
-      const decoded: any = jwtDecode(credential);
+      const decoded: DecodedToken = jwtDecode<DecodedToken>(credential);
       const { email } = decoded;
   
       try {
@@ -145,14 +156,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
         password: inputs.password,
         signup: isAdmin ? false : isSignup,
       });
-
-      // await Swal.fire({
-      //   position: "top-end",
-      //   icon: "success",
-      //   title: "Login Successful",
-      //   showConfirmButton: false,
-      //   timer: 1500,
-      // });
 
       router.push("/components/movies");
     } catch (err) {

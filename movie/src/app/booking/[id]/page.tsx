@@ -42,9 +42,9 @@ const Booking: React.FC = () => {
   const [selectedTheater, setSelectedTheater] = useState<string | null>(null);
   const [selectedTimes, setSelectedTimes] = useState<{ [key: string]: string | null }>({});
   const { id } = useParams(); // Get movie ID from URL
-  const [selectedTheaterName, setSelectedTheaterName] = useState<string | null>(null);
-  const [selectedTheaterLocation, setSelectedTheaterLocation] = useState<string | null>(null);
-  const [selectedTheaterSeatLayout, setSelectedTheaterSeatLayout] = useState<number[]>([]); // Assuming seatLayout is an array of numbers
+  // const [selectedTheaterName, setSelectedTheaterName] = useState<string | null>(null);
+  // const [selectedTheaterLocation, setSelectedTheaterLocation] = useState<string | null>(null);
+  const [selectedTheaterSeatLayout, setSelectedTheaterSeatLayout] = useState<number[]>([]); 
 
   const router = useRouter(); // Initialize router
 
@@ -131,9 +131,9 @@ const Booking: React.FC = () => {
       console.log('Available Times:', times);
 
       // Update theater details
-      const theater = selectedShows[0].theaterId; // Assuming all shows are in the same theater
-      setSelectedTheaterName(theater.name);
-      setSelectedTheaterLocation(theater.location);
+      const theater = selectedShows[0].theaterId; 
+      // setSelectedTheaterName(theater.name);
+      // setSelectedTheaterLocation(theater.location);
       setSelectedTheaterSeatLayout(theater.seatLayout);
     } else {
       console.error('No shows found for the selected date:', date);
@@ -266,6 +266,15 @@ const Booking: React.FC = () => {
               </Card>
             ))}
           </Box>
+
+          {/* {selectedTheaterName && selectedTheaterLocation && (
+            <Box>
+              <Typography variant="h6">Selected Theater:</Typography>
+              <Typography variant="body1">{selectedTheaterName}</Typography>
+              <Typography variant="body1">{selectedTheaterLocation}</Typography>
+            </Box>
+          )} */}
+          
 
           {/* Proceed to Book Button */}
           <Box display={'flex'} justifyContent={'center'} padding={2}>

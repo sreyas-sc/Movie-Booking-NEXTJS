@@ -5,10 +5,14 @@ import { sendAdminAuthRequest } from '@/app/api-helpers/api-helpers.js';
 import { useDispatch } from 'react-redux';
 import { adminActions } from '@/app/store';
 
+type AuthResponseData = {
+  id: string;
+  token: string;
+};
 
 const Admin = () => {
   const dispatch =  useDispatch();
-  const onResponseRecieved = (data: any) => {
+  const onResponseRecieved = (data: AuthResponseData) => {
     console.log("admin data is");
     console.log(data);
   
@@ -22,7 +26,7 @@ const Admin = () => {
   };
   
 
-  const getData = (data: any) =>{
+  const getData = (data: { email: string; password: string }) =>{
     console.log("Auth from admin", data)
     sendAdminAuthRequest(data)
     .then(onResponseRecieved)

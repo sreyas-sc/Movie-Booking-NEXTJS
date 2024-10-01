@@ -54,7 +54,7 @@ const AdminShowsPage = () => {
             Swal.fire('Deleted!', 'The show has been deleted.', 'success');
             setShows((prev) => prev.filter((show) => show._id !== showId)); // Update local state
           })
-          .catch((err: any) => {
+          .catch((err: Error) => {
             console.error(err);
             Swal.fire('Error!', 'An error occurred while deleting the show.', 'error');
           });

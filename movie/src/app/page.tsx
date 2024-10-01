@@ -18,14 +18,14 @@ interface UpcomingMovie {
   duration: string; // Adjust this if your API provides duration
 }
 
-interface LatestReleaseMovie {
-  id: string;
-  title: string;
-  posterUrl: string;
-  releaseDate: string;
-  duration: string; // Adjust this if your API provides duration
-  rating: number;
-}
+// interface LatestReleaseMovie {
+//   id: string;
+//   title: string;
+//   posterUrl: string;
+//   releaseDate: string;
+//   duration: string; // Adjust this if your API provides duration
+//   rating: number;
+// }
 
 interface UpcomingMovieResponse {
   results: UpcomingMovie[];
@@ -42,7 +42,7 @@ interface Movie {
 
 export default function Homepage() {
   const [upcomingMovies, setUpcomingMovies] = useState<UpcomingMovie[]>([]);
-  const [latestReleases, setLatestReleases] = useState<LatestReleaseMovie[]>([]);
+  // const [latestReleases, setLatestReleases] = useState<LatestReleaseMovie[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]); // Explicitly set the type here
 
 
