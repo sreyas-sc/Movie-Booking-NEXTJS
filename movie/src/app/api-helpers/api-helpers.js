@@ -1,7 +1,4 @@
-import { AutoFixOff } from '@mui/icons-material';
 import axios from 'axios'
-
-
 // **************For getting all the movies on the movies page*****************
 export const getAllMovies = async (filters = {}) => {
   try {

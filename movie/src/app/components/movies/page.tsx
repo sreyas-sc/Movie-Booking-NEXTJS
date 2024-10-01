@@ -1,14 +1,9 @@
-
 'use client'
-// import { Box, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import MovieCard from './movie-card';
 import { getAllMovies } from '@/app/api-helpers/api-helpers.js';
 
-import { Box, Typography, Button, Select, MenuItem, TextField } from '@mui/material';
-// import React, { useEffect, useState } from 'react';
-// import MovieCard from './movie-card';
-// import { getAllMovies } from '@/app/api-helpers/api-helpers.js';
+import { Box, Button, Select, MenuItem, TextField } from '@mui/material';
 
 const MoviePage = () => {
   // Define the Movie interface
@@ -21,22 +16,15 @@ const MoviePage = () => {
     rating: number;
     duration: string;
   }
-  
 
   const [movies, setMovies] = useState<Movie[]>([]);
   const [genre, setGenre] = useState('');
   const [rating, setRating] = useState('');
-  const [showtime, setShowtime] = useState('');
-
-  useEffect(() => {
-    fetchMovies();
-  }, [genre, rating, showtime]);
-
-  const fetchMovies = () => {
-    const filters: any = {};
+  
+  const fetchMovies = useCallback(() => {
+    const filters: Record<string, string | number> = {};
     if (genre) filters.genre = genre;
     if (rating) filters.rating = rating;
-    if (showtime) filters.showtime = showtime;
 
     getAllMovies(filters)
       .then((data) => {
@@ -48,66 +36,63 @@ const MoviePage = () => {
       .catch((err) => {
         console.error("Error fetching movies:", err);
       });
-  };
+  }, [genre, rating]);
+
+  useEffect(() => {
+    fetchMovies();
+  }, [fetchMovies]);
 
   return (
     <Box margin={"auto"} marginTop={4} display='flex' flexDirection="column" gap={3} padding={5}>
       {/* Filter section */}
       <Box 
-  display="flex" 
-  gap={2} 
-  justifyContent="center"  // Align filters to center
-  alignItems="center"       // Align vertically to center
-  marginBottom={3}          // Add some margin below filters
->
-  <Select value={genre} onChange={(e) => setGenre(e.target.value)} fullWidth displayEmpty>
-    <MenuItem value="">All Genres</MenuItem>
-    <MenuItem value="Action">Action</MenuItem>
-    <MenuItem value="Comedy">Comedy</MenuItem>
-    <MenuItem value="Fantasy">Fantasy</MenuItem>
-    <MenuItem value="Romance">Romance</MenuItem>
-    <MenuItem value="Fiction">Fiction</MenuItem>
-    <MenuItem value="Thriller">Thriller</MenuItem>
-    <MenuItem value="Horror">Horror</MenuItem>
-    <MenuItem value="Fantasy">Fnatasy</MenuItem>
-    {/* Add more genres as needed */}
-  </Select>
+        display="flex" 
+        gap={2} 
+        justifyContent="center"
+        alignItems="center"
+        marginBottom={3}
+      >
+        <Select value={genre} onChange={(e) => setGenre(e.target.value)} fullWidth displayEmpty>
+          <MenuItem value="">All Genres</MenuItem>
+          <MenuItem value="Action">Action</MenuItem>
+          <MenuItem value="Comedy">Comedy</MenuItem>
+          <MenuItem value="Fantasy">Fantasy</MenuItem>
+          <MenuItem value="Romance">Romance</MenuItem>
+          <MenuItem value="Fiction">Fiction</MenuItem>
+          <MenuItem value="Thriller">Thriller</MenuItem>
+          <MenuItem value="Horror">Horror</MenuItem>
+          <MenuItem value="Fantasy">Fnatasy</MenuItem>
+          {/* Add more genres as needed */}
+        </Select>
 
-  <TextField
-    fullWidth
-    type="number"
-    label="Min Rating"
-    value={rating}
-    onChange={(e) => setRating(e.target.value)}
-    InputProps={{ inputProps: { min: 0, max: 10 } }}
-  />
+        <TextField
+          fullWidth
+          type="number"
+          label="Min Rating"
+          value={rating}
+          onChange={(e) => setRating(e.target.value)}
+          InputProps={{ inputProps: { min: 0, max: 10 } }}
+        />
 
-  {/* <TextField
-  fullWidth
-    type="text"
-    label="Showtime"
-    value={showtime}
-    onChange={(e) => setShowtime(e.target.value)}
-    placeholder="e.g., 7:00 PM"
-  /> */}
-
-
-  <Button variant="contained" 
-    onClick={fetchMovies} 
-    sx={{
-          whiteSpace: 'nowrap' , minWidth: 'fit-content',
-          minHeight: '40px',
-          backgroundColor: 'transparent',
-          color: 'rgba(248, 68, 100)',
-          borderColor: 'rgba(248, 68, 100)',
-          '&:hover': {
-          backgroundColor:  'rgba(248, 68, 100, 0.1)',
-          },
-          margin: '2px',
-        }}>
+        <Button 
+          variant="contained" 
+          onClick={fetchMovies} 
+          sx={{
+            whiteSpace: 'nowrap', 
+            minWidth: 'fit-content',
+            minHeight: '40px',
+            backgroundColor: 'transparent',
+            color: 'rgba(248, 68, 100)',
+            borderColor: 'rgba(248, 68, 100)',
+            '&:hover': {
+              backgroundColor:  'rgba(248, 68, 100, 0.1)',
+            },
+            margin: '2px',
+          }}
+        >
           Apply Filter
-    </Button>
-</Box>
+        </Button>
+      </Box>
 
       {/* The movie cards section */}
       <Box width={'100%'} margin="auto" display={'flex'} justifyContent="center" gap={3} padding={5} flexWrap='wrap'>

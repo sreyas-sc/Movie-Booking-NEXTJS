@@ -9,7 +9,7 @@ interface MovieShowCardProps {
   releaseDate: string;
   posterUrl: string;
   duration: string;
-  id: String;
+  id: string;
 }
 
 

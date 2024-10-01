@@ -1,9 +1,8 @@
 'use client';
-import { deleteBooking, getUserBooking, getUserDetails } from '@/app/api-helpers/api-helpers.js';
-import { Box, Card, CardContent, CardHeader, Grid, IconButton, Typography } from '@mui/material';
-import React, { Fragment, useEffect, useState } from 'react';
+import { getUserBooking, getUserDetails } from '@/app/api-helpers/api-helpers.js';
+import { Box, Card, CardContent, CardHeader, Grid, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 interface Booking {
   _id: string;

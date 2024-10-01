@@ -1,4 +1,4 @@
-"use client"; // <-- Add this at the top
+"use client"; 
 
 import React, { useEffect, useState } from "react";
 import { AppBar, Autocomplete, Tab, Tabs, TextField, Toolbar } from "@mui/material";
@@ -12,7 +12,6 @@ import { adminActions, RootState, userActions } from "../store/index"; // Import
 const Header: React.FC = () => {
   const isAdminLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIN);
   const isUserLoggedIn = useSelector((state: RootState) => state.user.isLoggedIN);
-  const [value, setValue] = useState<number>(0);
   const [movies, setMovies] = useState<{ title: string }[]>([]); // Define state type for movies
   const dispatch = useDispatch()
 

@@ -1,6 +1,6 @@
 'use client';
 import React, { Fragment, useEffect, useState } from 'react';
-import { Box, TextField, Typography, Card, CardContent, Divider, Button, CardMedia } from '@mui/material';
+import { Box, Typography, Card, CardContent, Divider, Button, CardMedia } from '@mui/material';
 import { useParams } from 'next/navigation';
 import { getMovieDetails, getAllShows } from '@/app/api-helpers/api-helpers.js';
 import { useRouter } from 'next/navigation'; // Correct import
@@ -278,6 +278,14 @@ const Booking: React.FC = () => {
 
                 const movieId = Array.isArray(id) ? id[0] : id;
 
+                 // Find the selected show based on theater and time
+                const selectedShow = shows.find(show =>
+                  `${show.theaterId._id}-${show.theaterId.name}-${show.theaterId.location}` === selectedTheater &&
+                  show.times.includes(selectedTimes[selectedTheater] || '')
+                );
+
+                console.log("selected Show is", selectedShow)
+
                 // Save seat layout and selected details to localStorage
                 if (selectedTheater) {
                   localStorage.setItem('selectedMovie',  movie.title);
@@ -286,6 +294,8 @@ const Booking: React.FC = () => {
                   localStorage.setItem('selectedTheater', selectedTheater);
                   localStorage.setItem('selectedTimes', JSON.stringify(selectedTimes));
                   localStorage.setItem('seatLayout', JSON.stringify(selectedTheaterSeatLayout));
+                  // localStorage.setItem('selectedShowId', selectedShow._id); // Save the selected show ID
+
 
                   router.push('/components/seat-selection'); // Navigate to seat selection page
                 } else {
