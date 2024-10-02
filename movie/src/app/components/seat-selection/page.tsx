@@ -312,6 +312,9 @@
 // };
 
 // export default SeatSelection;
+
+
+
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, Grid } from '@mui/material';

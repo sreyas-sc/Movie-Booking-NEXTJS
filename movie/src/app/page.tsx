@@ -15,17 +15,8 @@ interface UpcomingMovie {
   poster_path: string;
   original_language: string;
   release_date: string;
-  duration: string; // Adjust this if your API provides duration
+  duration: string; 
 }
-
-// interface LatestReleaseMovie {
-//   id: string;
-//   title: string;
-//   posterUrl: string;
-//   releaseDate: string;
-//   duration: string; // Adjust this if your API provides duration
-//   rating: number;
-// }
 
 interface UpcomingMovieResponse {
   results: UpcomingMovie[];
@@ -42,7 +33,6 @@ interface Movie {
 
 export default function Homepage() {
   const [upcomingMovies, setUpcomingMovies] = useState<UpcomingMovie[]>([]);
-  // const [latestReleases, setLatestReleases] = useState<LatestReleaseMovie[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]); // Explicitly set the type here
 
 
@@ -52,7 +42,7 @@ export default function Homepage() {
       const userEmail = localStorage.getItem('userEmail');
       if (userEmail) {
         try {
-          const response = await axios.post('http://localhost:5000/user/getUserByEmail', { email: userEmail });
+          const response = await axios.post('https://movie-booking-nextjs.onrender.com/user/getUserByEmail', { email: userEmail });
           const userId = response.data.userId;
 
           // Store the userId in localStorage
