@@ -4,7 +4,7 @@ import { Box, Typography, Card, CardContent, Divider, Button, CardMedia } from '
 import { useParams } from 'next/navigation';
 import { getMovieDetails, getAllShows } from '@/app/api-helpers/api-helpers.js';
 import { useRouter } from 'next/navigation'; // Correct import
-import { json } from 'stream/consumers';
+
 
 interface Movie {
   releaseDate: string | number | Date;
@@ -165,7 +165,7 @@ const Booking: React.FC = () => {
                 <CardMedia
                 component="img"
                 height={"50%"} // Keep this to set the height
-                image={movie.posterUrl ? `http://localhost:5000/uploads/${movie.posterUrl.split('\\').pop()}` : ''}
+                image={movie.posterUrl ? `https://movie-booking-nextjs.onrender.com/uploads/${movie.posterUrl.split('\\').pop()}` : ''}
                 alt={movie.title}
                 sx={{ width: '50%', maxWidth: '50%', objectFit: 'cover' }} // Adjust width and maintain aspect ratio
               />

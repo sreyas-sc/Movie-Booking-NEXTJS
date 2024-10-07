@@ -6,6 +6,7 @@ import { Box, Typography, Grid, Card, CardMedia, CardContent, Button } from '@mu
 import MovieCard from './components/movies/movie-card';
 import Link from 'next/link';
 import { getAllMovies } from './api-helpers/api-helpers.js';
+import Image from 'next/image';
 
 interface UpcomingMovie {
   id: string;
@@ -44,7 +45,7 @@ export default function Homepage() {
       const userEmail = localStorage.getItem('userEmail');
       if (userEmail) {
         try {
-          const response = await axios.post('http://localhost:5000/user/getUserByEmail', { email: userEmail });
+          const response = await axios.post('https://movie-booking-nextjs.onrender.com/user/getUserByEmail', { email: userEmail });
           const userId = response.data.userId;
 
           // Store the userId in localStorage
@@ -121,16 +122,23 @@ export default function Homepage() {
     >
       {/* Image Display */}
       <Box margin="auto" width={"90%"} height={"500px"} position="relative">
-        <img
-          src={images[currentImageIndex]}
-          alt="Carousel Image"
-          width={"100%"}
-          height={"100%"}
-          style={{ objectFit: "cover", borderRadius: "8px" , transform: "scale(1.1)",
-            transition: "transform 0.3s ease-in-out"}}
-        />
 
-        {/* Left & Right Buttons */}
+
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}> {/* Set parent height here */}
+        <Image
+          src={images[currentImageIndex]} 
+          alt="Carousel Image"
+          layout="fill" 
+          objectFit="cover"
+          style={{
+            borderRadius: '8px',
+            transition: 'transform 0.3s ease-in-out',
+            transform: 'scale(1.1)',
+          }}
+        />
+      </div>
+
+            {/* Left & Right Buttons */}
         <Button
           onClick={handlePrev}
           sx={{
@@ -242,7 +250,7 @@ export default function Homepage() {
   {upcomingMovies.map((movie) => (
     <Grid item xs={12} sm={6} md={4} key={movie.id}>
       <Card sx={{
-        width: 500,
+        width: 400,
         height: 650,
         borderRadius: 5,
         display: 'flex',
