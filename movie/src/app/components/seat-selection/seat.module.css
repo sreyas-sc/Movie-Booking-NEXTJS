@@ -1,4 +1,32 @@
 Define your seat styles here
+
+/* seat.module.css */
+.available {
+  background-color: lightgray; /* Default color for available seats */
+  color: black;
+  margin: 4px;
+}
+
+.disabled {
+  background-color: gray;
+  color: white;
+  cursor: not-allowed; /* Show that the seat is not selectable */
+}
+
+.bookbutton{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.selected {
+  background-color: red; /* Change selected seat color to red */
+  color: white;
+  margin: 4px;
+}
+
+
 .seatButton {
     min-width: 0;
     width: 100%;

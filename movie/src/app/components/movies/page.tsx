@@ -105,6 +105,7 @@ const MoviePage = () => {
             releaseDate={movie.releaseDate}
             description={`Description for ${movie.title}`} // Placeholder description
             duration={movie.duration}
+            genre={movie.genre}
             rating={movie.rating}
           />
         ))}

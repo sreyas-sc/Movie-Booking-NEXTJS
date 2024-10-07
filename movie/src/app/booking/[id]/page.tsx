@@ -4,6 +4,7 @@ import { Box, Typography, Card, CardContent, Divider, Button, CardMedia } from '
 import { useParams } from 'next/navigation';
 import { getMovieDetails, getAllShows } from '@/app/api-helpers/api-helpers.js';
 import { useRouter } from 'next/navigation'; // Correct import
+import { json } from 'stream/consumers';
 
 interface Movie {
   releaseDate: string | number | Date;
@@ -298,6 +299,7 @@ const Booking: React.FC = () => {
                 // Save seat layout and selected details to localStorage
                 if (selectedTheater) {
                   localStorage.setItem('selectedMovie',  movie.title);
+                  localStorage.setItem('selectedMoviePoster', movie.posterUrl || '');
                   localStorage.setItem('selectedMovieId', movieId || ''); // Save movie ID
                   localStorage.setItem('selectedDate', selectedDate || '');
                   localStorage.setItem('selectedTheater', selectedTheater);

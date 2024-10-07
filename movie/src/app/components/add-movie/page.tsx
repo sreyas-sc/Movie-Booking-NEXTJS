@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { addMovie, getAllTheatres } from '@/app/api-helpers/api-helpers';
 import { Box, Button, TextField, Typography, Checkbox, Card, CardMedia, CardContent, Grid } from '@mui/material';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 // Define a type for TMDB movie
 interface TmdbMovie {
@@ -75,8 +76,6 @@ const AddMovie = () => {
     }
   };
 
-  
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
@@ -92,8 +91,26 @@ const AddMovie = () => {
     formData.append('cast', JSON.stringify(cast)); // Cast members
 
     addMovie(formData)
-      .then((res) => console.log('Movie added:', res))
-      .catch((err) => console.error('Error adding movie:', err));
+      .then((res) => {
+        console.log('Movie added:', res);
+        // Show SweetAlert on successful movie addition
+        Swal.fire({
+          title: 'Success!',
+          text: 'Movie added successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+      })
+      .catch((err) => {
+        console.error('Error adding movie:', err);
+        // Optionally show an error alert
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to add movie. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      });
   };
 
   useEffect(() => {
@@ -200,48 +217,24 @@ const AddMovie = () => {
         <Typography>Featured</Typography>
 
         <label htmlFor="poster">Poster</label>
-        <input type="file" name="poster" id="poster" onChange={handleFileChange} />
+        <input type="file" name="poster" accept="image/*" onChange={handleFileChange} />
 
-        <input type="file" name="castPhotos" multiple onChange={handleFileChange} />
+        <label htmlFor="castPhotos">Cast Photos</label>
+        <input type="file" name="castPhotos" accept="image/*" multiple onChange={handleFileChange} />
+
+        {/* Cast Members Section */}
         <TextField
-          name="newCastMember"
           label="Add Cast Member"
           variant="standard"
-          margin="normal"
           value={newCastMember}
           onChange={handleCastChange}
+          onKeyDown={(e) => { if (e.key === 'Enter') addCastMember(); }}
         />
-        <Button type="button" variant="contained" onClick={addCastMember}>Add Cast</Button>
+        <Button variant="contained" onClick={addCastMember}>Add Cast</Button>
+        <Typography>Cast: {cast.join(', ')}</Typography>
 
-        <Typography>Cast Members:</Typography>
-        <ul>
-          {cast.map((member, index) => (
-            <li key={index}>{member}</li>
-          ))}
-        </ul>
-
-        <Button type="submit" variant="contained" sx={{ width: "30%", bgcolor: "#2b2d42", marginTop: '10px' }}>Add Movie</Button>
+        <Button type="submit" variant="contained" color="primary">Add Movie</Button>
       </Box>
-
-      {/* Selected Movie Preview */}
-      {selectedMovie && (
-        <Box width={"50%"} margin="auto" padding="20px" boxShadow="10px 10px 20px #ccc" marginTop="20px">
-          <Card>
-            <CardMedia
-              component="img"
-              height="400"
-              image={`https://image.tmdb.org/t/p/w500/${selectedMovie.poster_path}`}
-              alt={selectedMovie.title}
-            />
-            <CardContent>
-              <Typography variant="h6">{selectedMovie.title}</Typography>
-              <Typography variant="body2" color="textSecondary">{selectedMovie.overview}</Typography>
-              <Typography variant="body2" color="textSecondary">Release Date: {selectedMovie.release_date}</Typography>
-              <Typography variant="body2" color="textSecondary">Rating: {selectedMovie.vote_average}</Typography>
-            </CardContent>
-          </Card>
-        </Box>
-      )}
     </form>
   );
 };

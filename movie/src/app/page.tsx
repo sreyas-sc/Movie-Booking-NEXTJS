@@ -15,6 +15,7 @@ interface UpcomingMovie {
   poster_path: string;
   original_language: string;
   release_date: string;
+  genre: string;
   duration: string; 
 }
 
@@ -28,6 +29,7 @@ interface Movie {
   posterUrl: string;
   releaseDate: string;
   rating:  number;
+  genre: string;
 
 }
 
@@ -209,6 +211,7 @@ export default function Homepage() {
             releaseDate={movie.releaseDate}
             description={`Description for ${movie.title}`} // Placeholder description
             duration="N/A" // Adjust this if you have duration data
+            genre={movie.genre}
             rating={movie.rating}
           />
         ))}
