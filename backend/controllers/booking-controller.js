@@ -133,6 +133,32 @@ export const deleteBooking = async (req, res) => {
   return res.status(200).json({ message: "Successfully deleted the booking" });
 };
 
+// ************* Get the booked seats****************
+// Server-side function to handle requests
+export const getBookedSeatsHandler = async (req, res) => {
+  console.log("This is being called to get the booked seats")
+  const { movieId, theaterId, date, time } = req.query;
+
+  try {
+    // Fetch bookings that match the provided parameters
+    const bookings = await Bookings.find({
+      movieId,
+      theaterId,
+      date,
+      time,
+    });
+
+    // Extract the seat numbers from the bookings
+    const bookedSeats = bookings.flatMap(booking => booking.seatNumbers);
+    console.log(bookedSeats)
+    
+    res.status(200).json(bookedSeats);
+  } catch (error) {
+    console.error('Error fetching booked seats:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 
 // *************Razorpay setup******************
@@ -163,32 +189,29 @@ export const razorpayOrder = async (req, res) => {
 
 
 // *************Fetech selected seats*******************
-export const checkSeatAvailability = async (req, res) => {
-  const { movieId, theaterId, date, time, seats } = req.body;
+export const fetchBookedSeats = async (req, res) => {
+  console.log("!@!@!@!@!!!!!!!!!!!!!!!!!!!!!!!!!!!@!@!@!@!@!")
+  const { movieId, theaterId, date, time } = req.body;
 
   try {
-    // Find bookings that match the criteria
-    const bookings = await Booking.find({
+    // Find all bookings that match the given criteria
+    const bookings = await Bookings.find({
       movieId,
       theaterId,
       date,
       time,
-      seatNumbers: { $in: seats }
     });
 
-    // Collect booked seats
+    // Collect all booked seats for the specified show
     const bookedSeats = new Set();
     bookings.forEach(booking => {
       booking.seatNumbers.forEach(seat => bookedSeats.add(seat));
     });
 
-    // Filter out booked seats from the requested seats
-    const availableSeats = seats.filter(seat => !bookedSeats.has(seat));
-
-    // Respond with available seats
-    return res.status(200).json({ availableSeats });
+    // Respond with an array of booked seats
+    return res.status(200).json({ bookedSeats: Array.from(bookedSeats) });
   } catch (error) {
-    console.error('Error checking seat availability:', error);
+    console.error('Error fetching booked seats:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

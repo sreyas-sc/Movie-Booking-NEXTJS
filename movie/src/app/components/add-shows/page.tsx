@@ -117,7 +117,7 @@ const AddShows = () => {
           <CardMedia
             component="img"
             height={350}
-            image={`https://movie-booking-nextjs.onrender.com/uploads/${movieDetails.posterUrl.split('\\').pop()}`}
+            image={`http://localhost:5000/uploads/${movieDetails.posterUrl.split('\\').pop()}`}
             alt={movieDetails.title}
           />
           <CardContent>

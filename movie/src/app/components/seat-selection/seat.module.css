@@ -19,6 +19,11 @@ Define your seat styles here
   justify-content: center;
 }
 
+.booked {
+  background-color: rgb(145, 145, 145); /* or any color to indicate booked */
+  color: white;
+  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+}
 
 .selected {
   background-color: red; /* Change selected seat color to red */
