@@ -190,7 +190,6 @@ export const razorpayOrder = async (req, res) => {
 
 // *************Fetech selected seats*******************
 export const fetchBookedSeats = async (req, res) => {
-  console.log("!@!@!@!@!!!!!!!!!!!!!!!!!!!!!!!!!!!@!@!@!@!@!")
   const { movieId, theaterId, date, time } = req.body;
 
   try {

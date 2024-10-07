@@ -299,28 +299,7 @@ const SeatSelection: React.FC = () => {
           </Typography>
         </Box>
 
-              {/* <Grid container spacing={2}>
-        {seatLayout.map((row, rowIndex) => (
-          <Grid container item key={rowIndex} justifyContent="center">
-            {row.map((seatLabel) => {
-              const isSelected = selectedSeats.has(seatLabel);
-              return (
-                <Grid item key={seatLabel}>
-                  <Button
-                    variant="outlined"
-                    className={isSelected ? styles.selected : styles.available}
-                    onClick={() => handleSeatClick(seatLabel)}
-                  >
-                    {seatLabel}
-                  </Button>
-                </Grid>
-              );
-            })}
-          </Grid>
-        ))}
-      </Grid> */}
-
-<Grid container spacing={2}>
+        <Grid container spacing={2}>
           {seatLayout.map((row, rowIndex) => (
             <Grid container item key={rowIndex} justifyContent="center">
               {row.map((seatLabel) => {

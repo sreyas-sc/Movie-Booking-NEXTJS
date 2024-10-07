@@ -1,6 +1,8 @@
 import axios from 'axios'
 // https://movie-booking-nextjs.onrender.com
-// http://localhost:5000
+// 'http://localhost:5000'
+
+
 // **************For getting all the movies on the movies page*****************
 export const getAllMovies = async (filters = {}) => {
   try {
