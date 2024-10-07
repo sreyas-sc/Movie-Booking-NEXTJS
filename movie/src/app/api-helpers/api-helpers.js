@@ -135,28 +135,6 @@ export const sendUserAuthRequest = async (data, signup) => {
   };
   
   
-//************************ add movie************************ 
-// export const addMovie = async (formData) => {
-
-
-//   console.log("formData from the api-helper", formData)
-//   const token = localStorage.getItem("token");
-//   try {
-//     const res = await axios.post('http://localhost:5000/movie', formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data',
-//         'Authorization': `Bearer ${token}`,
-//       },
-//     });
-//     if (res.status !== 201) {
-//       throw new Error(`Failed to add movie, status: ${res.status}`);
-//     }
-//     return res.data;
-//   } catch (err) {
-//     console.error('Error adding movie:', err.response?.data || err.message);
-//     throw err;
-//   }
-// };
 
 export const addMovie = async (formData) => {
   console.log('Sending formData:', formData); // Log the formData
@@ -323,6 +301,9 @@ export const deleteShow = async (showId) => {
 // *******************Get booked seats for a specific show*******************
 // ******************* Check Seat Availability for a Specific Show *******************
 export const checkSeatAvailability = async ({ movieId, theaterId, date, time }) => {
+  console.log("**************************************")
+  console.log(movieId, theaterId, date)
+  console.log("time is",time)
   try {
     // Send a POST request to fetch booked seats for the specified show
     const res = await axios.post(`http://localhost:5000/booking/fetch-seats`, {
