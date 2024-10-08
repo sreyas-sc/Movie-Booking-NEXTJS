@@ -220,16 +220,21 @@ const AddMovie: React.FC = () => {
       </div>
 
       <div className={styles.gridContainer}>
-        {tmdbMovies.map((movie, index) => (
-          <div className={styles.card} key={index} onClick={() => selectTmdbMovie(movie)}>
-            <Image
-              src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-              alt={movie.title}
-              className={styles.moviePoster}
-            />
-            <h3 className={styles.cardTitle}>{movie.title}</h3>
-          </div>
-        ))}
+      {tmdbMovies.map((movie, index) => (
+  <div className={styles.card} key={index} onClick={() => selectTmdbMovie(movie)}>
+    <img
+      src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+      alt={movie.title}
+      onError={(e) => {
+        // Fallback to a placeholder image when the URL is broken
+        e.currentTarget.src = "https://via.placeholder.com/500";
+      }}
+      className={styles.moviePoster}
+    />
+    <h3 className={styles.cardTitle}>{movie.title}</h3>
+  </div>
+))}
+
       </div>
 
       {selectedMovie && (
@@ -239,6 +244,8 @@ const AddMovie: React.FC = () => {
         {/* Banner for selected movie */}
         <div className={styles.banner}>
           <Image
+            width={50}
+            height={50}
             src={`https://image.tmdb.org/t/p/w500/${selectedMovie.poster_path}`}
             alt={selectedMovie.title}
             className={styles.bannerImage}
