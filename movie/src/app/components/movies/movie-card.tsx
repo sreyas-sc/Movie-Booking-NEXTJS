@@ -80,7 +80,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
             Genre: {genre}
           </Typography>
         </CardContent>
-        {isUserLoggedIn && !isAdminLoggedIn && (
+        
           <CardActions sx={{ justifyContent: 'center', paddingBottom: 2 }}>
             <Button
               onClick={handleClick}
@@ -97,7 +97,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
               Book Tickets
             </Button>
           </CardActions>
-        )}
+        
       </Card>
 
       {/* Modal for movie details */}
