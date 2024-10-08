@@ -20,8 +20,6 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const isUserLoggedIn = Boolean(localStorage.getItem('userId'));
-  const isAdminLoggedIn = Boolean(localStorage.getItem('adminId'));
 
   const handleClick = () => {
     const userId = localStorage.getItem('userId');
