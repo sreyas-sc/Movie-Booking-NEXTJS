@@ -11,12 +11,13 @@ import {
   Container,
   Box,
   CardActions,
+  CardMedia,
 } from '@mui/material';
 
 interface Show {
   _id: string;
   theaterId: { name: string; location: string };
-  movieId: { title: string };
+  movieId: { title: string; posterUrl?: string }; // Include posterUrl in movieId
   dates: Date[];
   times: string[];
 }
@@ -70,57 +71,73 @@ const AdminShowsPage = () => {
         </Typography>
       </Box>
       <Grid container spacing={4}>
-        {shows.map((show) => (
-          <Grid item xs={12} sm={6} md={4} key={show._id}>
-            <Card elevation={3} sx={{ 
-        width: 300, 
-        height: 250, 
-        borderRadius: 5, 
-        display: 'flex', 
-        flexDirection: 'column',
-        justifyContent: 'space-between', // Ensure the content and button are spaced
-        ":hover": {
-          boxShadow: "10px 10px 20px #ccc"
-        }
-      }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                {show.movieId ? show.movieId.title : 'Title not available'}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Theatre:</strong> {show.theaterId.name} ({show.theaterId.location})
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Date:</strong> {new Date(show.dates[0]).toLocaleDateString()}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Times:</strong> {show.times.join(', ')}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => handleDelete(show._id)}
-                  fullWidth
-                sx={{
-                    size: "small",
-            color: "rgb(255, 255, 255)",
-            borderRadius: "8px",
-            backgroundColor: "rgba(248, 68, 100)",
-            border: "1px solid rgb(245, 255, 255)",
-            '&:hover': {
-              backgroundColor: "rgba(248, 68, 100)",
-            }
-                }}
-                
-                >
-                  Delete Show
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
+        {shows.map((show) => {
+          // Construct image URL, adding a fallback
+          const posterUrl = show.movieId.posterUrl 
+            ? `http://localhost:5000/uploads/${show.movieId.posterUrl.split('\\').pop()}` 
+            : '/default-image.jpg';
+
+          return (
+            <Grid item xs={12} sm={6} md={4} key={show._id}>
+              <Card elevation={3} sx={{ 
+                width: 300, 
+                height: 480, 
+                borderRadius: 5, 
+                display: 'flex', 
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                ":hover": {
+                  boxShadow: "10px 10px 20px #ccc"
+                }
+              }}>
+                <CardMedia
+                  component="img"
+                  height={250} // Set height for the image
+                  image={posterUrl}
+                  alt={`${show.movieId.title} Poster`}
+                  sx={{
+                    borderRadius: '5px 5px 0 0',
+                    objectFit: 'cover'
+                  }}
+                />
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {show.movieId.title || 'Title not available'}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Theatre:</strong> {show.theaterId.name} ({show.theaterId.location})
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    <strong>Date:</strong> {new Date(show.dates[0]).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    <strong>Times:</strong> {show.times.join(', ')}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleDelete(show._id)}
+                    fullWidth
+                    sx={{
+                      size: "small",
+                      color: "rgb(255, 255, 255)",
+                      borderRadius: "8px",
+                      backgroundColor: "rgba(248, 68, 100)",
+                      border: "1px solid rgb(245, 255, 255)",
+                      '&:hover': {
+                        backgroundColor: "rgba(248, 68, 100)",
+                      }
+                    }}
+                  >
+                    Delete Show
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
     </Container>
   );

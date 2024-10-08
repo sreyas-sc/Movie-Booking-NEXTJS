@@ -4,8 +4,7 @@ import Show from '../models/Show.js';
 export const addShow = async (req, res) => {
 
   try {
-    const { theaterId, movieId, dates, times } = req.body;
-    console.log(req.body)
+    const { theaterId, movieId, dates, times, posterUrl } = req.body;
 
     // Validate input
     if (!theaterId || !movieId || !dates || !times) {
@@ -18,6 +17,7 @@ export const addShow = async (req, res) => {
       movieId,
       dates,
       times,
+      posterUrl
     });
 
     // Save to the database

@@ -45,7 +45,7 @@ export default function Homepage() {
       const userEmail = localStorage.getItem('userEmail');
       if (userEmail) {
         try {
-          const response = await axios.post('https://movie-booking-nextjs.onrender.com/user/getUserByEmail', { email: userEmail });
+          const response = await axios.post('http://localhost:5000/user/getUserByEmail', { email: userEmail });
           const userId = response.data.userId;
 
           // Store the userId in localStorage

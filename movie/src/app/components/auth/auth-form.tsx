@@ -65,7 +65,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
       const { email } = decoded;
   
       try {
-        await axios.post("https://movie-booking-nextjs.onrender.com/user/send-otp", { email });
+        await axios.post("http://localhost:5000/user/send-otp", { email });
 
         const response = await googleSignIn(email);  
         console.log("Google Sign-In response:", response);  // Add this line to inspect the response
@@ -104,7 +104,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
       // Log email and OTP for debugging
       console.log("Sending payload:", { email, otp });
   
-      const response = await axios.post("https://movie-booking-nextjs.onrender.com/user/verify-otp", { email, otp });
+      const response = await axios.post("http://localhost:5000/user/verify-otp", { email, otp });
   
       if (response.data.success) {
         sessionStorage.removeItem("googleEmail");
@@ -143,21 +143,32 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     if (!inputs.email || !inputs.password || (isSignup && !inputs.phone)) {
       alert("Please fill in all the required fields.");
       return;
     }
-
+  
     try {
-      await onSubmit({
+      onSubmit({
         email: inputs.email,
         phone: inputs.phone,
         password: inputs.password,
         signup: isAdmin ? false : isSignup,
       });
-
-      router.push("/components/movies");
+  
+      if (isSignup) {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Signup Successful! Please sign in to continue.",
+          showConfirmButton: false,
+          timer: 2000,
+        });
+        setIsSignup(false); // Switch to sign-in page after signup
+      } else {
+        router.push("/components/movies");
+      }
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -166,6 +177,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
       });
     }
   };
+  
 
   return (
     <>

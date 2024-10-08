@@ -5,6 +5,7 @@ const ShowSchema = new mongoose.Schema({
   movieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Movie', required: true },
   dates: [{ type: Date }],
   times: [{ type: String }],
+  posterUrl: { type: String, required: true },
 });
 
 const Show = mongoose.model('Show', ShowSchema);

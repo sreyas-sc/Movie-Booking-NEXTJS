@@ -45,17 +45,14 @@ const seatSchema = new mongoose.Schema({
 });
 
 const showtimeSchema = new mongoose.Schema({
-  movieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Movie', required: true },
-  date: { type: Date, required: true },
-  time: { type: String, required: true }, 
-  seats: [seatSchema],
+  time: { type: String, required: true },  // Only time is required
 });
 
 const theatreSchema = new mongoose.Schema({
-  name: String,
-  location: String,
+  name: { type: String, required: true },  // Make name required
+  location: { type: String, required: true },  // Make location required
   seatLayout: { type: [Number], default: [] }, // Ensure seatLayout is an array
-  showtimes: [{ time: String }]
+  showtimes: [showtimeSchema],  // Array of showtimes with only time
 });
 
 export const Theatre = mongoose.model('Theatre', theatreSchema);

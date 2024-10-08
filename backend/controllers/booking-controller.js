@@ -37,7 +37,6 @@ async function sendWhatsappMessage(to, message, qrCodeUrl) {
       to: `whatsapp:${+918111904512}`, // Customer's WhatsApp number
       mediaUrl: [qrCodeUrl],
     });
-    console.log("Message sent, SID:", response.sid);
   } catch (error) {
     console.error("Error sending WhatsApp message:", error);
     throw new Error("Error sending WhatsApp message");
@@ -73,7 +72,6 @@ export const newBooking = async (req, res) => {
       fileName: "qr-code.png",
     });
 
-    console.log('ImageKit Upload Response:', uploadResponse);
 
     // Save the booking to the database
     const savedBooking = await booking.save();
@@ -136,7 +134,6 @@ export const deleteBooking = async (req, res) => {
 // ************* Get the booked seats****************
 // Server-side function to handle requests
 export const getBookedSeatsHandler = async (req, res) => {
-  console.log("This is being called to get the booked seats")
   const { movieId, theaterId, date, time } = req.query;
 
   try {

@@ -17,6 +17,10 @@ interface MovieCardProps {
 const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, posterUrl, duration, id, genre, rating }) => {
   const router = useRouter();
 
+  const isUserLoggedIn = Boolean(localStorage.getItem('userId')); // True if `userId` is in localStorage
+  const isAdminLoggedIn = Boolean(localStorage.getItem('adminId')); // True if `adminId` is in localStorage
+
+
   const handleClick = () => {
     const userId = localStorage.getItem('userId');
     if (userId) {
@@ -28,7 +32,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
 
   // Simplified image URL handling with a fallback
   const imageUrl = posterUrl 
-    ? `https://movie-booking-nextjs.onrender.com/uploads/${posterUrl.split('\\').pop()}` 
+    ? `http://localhost:5000/uploads/${posterUrl.split('\\').pop()}` 
     : '/default-image.jpg';
 
 
@@ -76,22 +80,25 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
           Genre: {genre}
         </Typography>
       </CardContent>
-      <CardActions sx={{ justifyContent: 'center', paddingBottom: 2 }}>
-        <Button
-          onClick={handleClick}
-          sx={{
-            color: "white",
-            borderRadius: "8px",
-            backgroundColor: "rgba(248, 68, 100, 1)",
-            border: "1px solid rgba(245, 255, 255, 0.5)",
-            '&:hover': {
-              backgroundColor: "rgba(248, 68, 100, 0.9)",
-            }
-          }}
-        >
-          Book Tickets
-        </Button>
-      </CardActions>
+      {/* Show the "Book Tickets" button only if a user is logged in, not an admin */}
+      {isUserLoggedIn && !isAdminLoggedIn && (
+        <CardActions sx={{ justifyContent: 'center', paddingBottom: 2 }}>
+          <Button
+            onClick={handleClick}
+            sx={{
+              color: "white",
+              borderRadius: "8px",
+              backgroundColor: "rgba(248, 68, 100, 1)",
+              border: "1px solid rgba(245, 255, 255, 0.5)",
+              '&:hover': {
+                backgroundColor: "rgba(248, 68, 100, 0.9)",
+              }
+            }}
+          >
+            Book Tickets
+          </Button>
+        </CardActions>
+      )}
     </Card>
   );
 };

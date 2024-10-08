@@ -41,94 +41,102 @@ const Header: React.FC = () => {
   };
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: "#2b2d42" }}>
-      <Toolbar>
-        {/* Home page link with Movie Icon */}
-        <Box width={"20%"}>
-          <Link href="/" legacyBehavior passHref>
-            <a>
-              <MovieIcon />
-            </a>
-          </Link>
-        </Box>
-
-        {/* Autocomplete textbox to search for the movie names */}
-        <Box width={"50%"} margin={"auto"}>
-          {!isAdminLoggedIn && (
-            <Autocomplete
-              freeSolo
-              options={movies && movies.length > 0 ? movies.map((option) => option.title) : []}
-              renderInput={(params) => (
-                <TextField
-                  sx={{ input: { color: "white" } }}
-                  variant="standard"
-                  {...params}
-                  placeholder="Search across movies"
-                />
-              )}
-            />
-          )}
-        </Box>
-
-        {/* Box for the Tabs */}
-        <Box display={"flex"}>
-          <Tabs
-            sx={{
-              color: "rgb(220, 53, 88)",
-              fontWeight: "1000",
-            }}
-          >
-            <Link href="/components/movies" legacyBehavior passHref>
-              <Tab label="Movies" component="a" sx={{ fontWeight: "bold" }} />
+    <>
+      {/* AppBar positioned as fixed */}
+      <AppBar position="fixed" sx={{ bgcolor: "#2b2d42" }}>
+        <Toolbar>
+          {/* Home page link with Movie Icon */}
+          <Box width={"20%"}>
+            <Link href="/" passHref>
+              <MovieIcon sx={{ cursor: "pointer" }} />
             </Link>
+          </Box>
 
-            {/* if logged in, hide the auth links */}
-            {!isAdminLoggedIn && !isUserLoggedIn && (
-              <>
-                <Link href="/components/auth" legacyBehavior passHref>
-                  <Tab label="User" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
-                <Link href="/components/admin" legacyBehavior passHref>
-                  <Tab label="Admin" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
-              </>
+          {/* Autocomplete textbox to search for the movie names */}
+          <Box width={"50%"} margin={"auto"}>
+            {!isAdminLoggedIn && (
+              <Autocomplete
+                freeSolo
+                options={movies && movies.length > 0 ? movies.map((option) => option.title) : []}
+                renderInput={(params) => (
+                  <TextField
+                    sx={{ input: { color: "white" } }}
+                    variant="standard"
+                    {...params}
+                    placeholder="Search across movies"
+                  />
+                )}
+              />
             )}
+          </Box>
 
-            {/* if user is logged in, show profile and logout */}
-            {isUserLoggedIn && (
-              <>
-                <Link href="/components/user-profile" legacyBehavior passHref>
-                  <Tab label="Profile" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
-                <Link href="/" legacyBehavior passHref>
-                  <Tab onClick={() => handleLogout(false)} label="Logout" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
-              </>
-            )}
+          {/* Box for the Tabs */}
+          <Box display={"flex"}>
+            <Tabs
+              sx={{
+                color: "rgb(220, 53, 88)",
+                fontWeight: "1000",
+              }}
+            >
+              <Link href="/components/movies" passHref>
+                <Tab label="Movies" component="a" sx={{ fontWeight: "bold" }} />
+              </Link>
 
-            {/* if admin is logged in, show add movie and profile */}
-            {isAdminLoggedIn && (
-              <>
-                <Link href="/components/add-movie" legacyBehavior passHref>
-                  <Tab label="Add Movie" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
+              {/* if not logged in, show the auth links */}
+              {!isAdminLoggedIn && !isUserLoggedIn && (
+                <>
+                  <Link href="/components/auth" passHref>
+                    <Tab label="User" component="a" sx={{ fontWeight: "bold" }} />
+                  </Link>
+                  <Link href="/components/admin" passHref>
+                    <Tab label="Admin" component="a" sx={{ fontWeight: "bold" }} />
+                  </Link>
+                </>
+              )}
 
-                <Link href="/components/add-theatre" legacyBehavior passHref>
-                  <Tab label="Add Theatre" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
+              {/* if user is logged in, show profile and logout */}
+              {isUserLoggedIn && (
+                <>
+                  <Link href="/components/user-profile" passHref>
+                    <Tab label="Profile" component="a" sx={{ fontWeight: "bold" }} />
+                  </Link>
+                  <Tab
+                    label="Logout"
+                    sx={{ fontWeight: "bold" }}
+                    onClick={() => handleLogout(false)}
+                  />
+                </>
+              )}
 
-                <Link href="/components/admin-view-shows" legacyBehavior passHref>
-                  <Tab label="Shows" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
-                <Link href="/" legacyBehavior passHref>
-                  <Tab onClick={() => handleLogout(true)} label="Logout" component="a" sx={{ fontWeight: "bold" }} />
-                </Link>
-              </>
-            )}
-          </Tabs>
-        </Box>
-      </Toolbar>
-    </AppBar>
+              {/* if admin is logged in, show add movie and profile */}
+              {isAdminLoggedIn && (
+                <>
+                  <Link href="/components/add-movie" passHref>
+                    <Tab label="Add Movie" component="a" sx={{ fontWeight: "bold" }} />
+                  </Link>
+
+                  <Link href="/components/add-theatre" passHref>
+                    <Tab label="Add Theatre" component="a" sx={{ fontWeight: "bold" }} />
+                  </Link>
+
+                  <Link href="/components/admin-view-shows" passHref>
+                    <Tab label="Shows" component="a" sx={{ fontWeight: "bold" }} />
+                  </Link>
+                  <Tab
+                    label="Logout"
+                    sx={{ fontWeight: "bold" }}
+                    onClick={() => handleLogout(true)}
+                  />
+                </>
+              )}
+            </Tabs>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Add a spacer to avoid content overlap */}
+      <Box sx={{ height: "64px" }}></Box>
+    </>
   );
 };
 

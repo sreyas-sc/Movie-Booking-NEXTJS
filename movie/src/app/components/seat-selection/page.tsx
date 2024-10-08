@@ -4,7 +4,10 @@ import { Box, Typography, Button, Grid } from '@mui/material';
 import toast from 'react-hot-toast'; 
 import styles from './seat.module.css';
 import Swal from 'sweetalert2';
+import { useRouter } from "next/navigation";
 import { checkSeatAvailability } from '@/app/api-helpers/api-helpers.js';
+
+
 
 
 // Interface for Razorpay payment response
@@ -41,6 +44,7 @@ interface RazorpayOptions {
 
 // Main SeatSelection component
 const SeatSelection: React.FC = () => {
+  const router = useRouter();
   const [seatLayout, setSeatLayout] = useState<string[][]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Set<string>>(new Set());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -135,7 +139,7 @@ const SeatSelection: React.FC = () => {
   
   const proceedBooking = async () => {
     try {
-      const response = await fetch('https://movie-booking-nextjs.onrender.com/booking/razorpay', {
+      const response = await fetch('http://localhost:5000/booking/razorpay', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,53 +167,56 @@ const SeatSelection: React.FC = () => {
       }
   
       const options: RazorpayOptions = {
-        key: data.key,
-        amount: data.amount,
-        currency: data.currency,
-        name: 'Movie Booking',
-        description: 'Seat Booking',
-        order_id: data.orderId,
-        handler: async (response: RazorpayPaymentResponse) => {
-          console.log('Payment successful!');
+  key: data.key,
+  amount: data.amount,
+  currency: data.currency,
+  name: 'Movie Booking',
+  description: 'Seat Booking',
+  order_id: data.orderId,
+  handler: async (response: RazorpayPaymentResponse) => {
+    console.log('Payment successful!');
 
-          // Send booking data to the backend after successful payment
-          const bookingResponse = await fetch('https://movie-booking-nextjs.onrender.com/booking/book', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              movieName,
-              movieId,
-              userId: localStorage.getItem('userId'),
-              theaterName: selectedTheater?.split('-')[1] || '',
-              theaterId: selectedTheater?.split('-')[0] || '',
-              date: selectedDate,
-              time: Object.values(selectedTimes).join(', '),
-              seatNumbers: Array.from(selectedSeats),
-              totalAmount: totalCost, // Total cost in rupees
-              paymentId: response.razorpay_payment_id, // Razorpay payment ID
-            }),
-          });
+    // Send booking data to the backend after successful payment
+    const bookingResponse = await fetch('http://localhost:5000/booking/book', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        movieName,
+        movieId,
+        userId: localStorage.getItem('userId'),
+        theaterName: selectedTheater?.split('-')[1] || '',
+        theaterId: selectedTheater?.split('-')[0] || '',
+        date: selectedDate,
+        time: Object.values(selectedTimes).join(', '),
+        seatNumbers: Array.from(selectedSeats),
+        totalAmount: totalCost, // Total cost in rupees
+        paymentId: response.razorpay_payment_id, // Razorpay payment ID
+      }),
+    });
 
-          const bookingData = await bookingResponse.json();
-          if (bookingData) {
-            Swal.fire({
-              title: "Payment Done!",
-              text: "The movie booking is completed",
-              icon: "success"
-            });
-          }
-        },
-        prefill: {
-          name: '', // Prefill user details if available
-          email: '',
-          contact: '',
-        },
-        theme: {
-          color: '#F37254',
-        },
-      };
+    const bookingData = await bookingResponse.json();
+    if (bookingData) {
+      Swal.fire({
+        title: "Payment Done!",
+        text: "The movie booking is completed",
+        icon: "success"
+      });
+
+      // Redirect the user to the 'Add Theatre' page after successful payment
+      router.push('/components/user-profile');
+    }
+  },
+  prefill: {
+    name: '', // Prefill user details if available
+    email: '',
+    contact: '',
+  },
+  theme: {
+    color: '#F37254',
+  },
+};
 
       const payment = new (window as { Razorpay: new (options: RazorpayOptions) => { open: () => void } }).Razorpay(options); 
       payment.open();

@@ -7,6 +7,17 @@
  
 }
 
+.error {
+  border: 1px solid red; /* Border color for error */
+  background-color: #ffe6e6; /* Light red background */
+}
+
+/* Optional: Change the label color as well */
+.error label {
+  color: red; /* Change label color to red when error occurs */
+}
+
+
 html,
 body {
   margin: 0;

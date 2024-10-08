@@ -149,7 +149,6 @@ export const getAllMovies = async (req, res, next) => {
 
 export const getMovieById = async (req, res) => {
     const movieId = req.params.id;
-    console.log(`Fetching movie with ID: ${movieId}`); // Log the ID
   
     try {
       const movie = await Movie.findById(movieId); // Replace with your actual method to fetch movie

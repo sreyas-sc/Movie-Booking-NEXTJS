@@ -1,253 +1,381 @@
-  'use client';
-  import { useState, useEffect } from 'react';
-  import { addMovie, getAllTheatres } from '@/app/api-helpers/api-helpers';
-  import { Box, Button, TextField, Typography, Checkbox, Card, CardMedia, CardContent, Grid } from '@mui/material';
-  import Swal from 'sweetalert2'; // Import SweetAlert2
+'use client';
+import React, { useState, useEffect, useRef } from 'react';
+import { addMovie, getAllTheatres } from '@/app/api-helpers/api-helpers';
+import Swal from 'sweetalert2';
+import styles from './add-movie.module.css';
 
-  // Define a type for TMDB movie
-  interface TmdbMovie {
-    id: number;
-    title: string;
-    overview: string;
-    release_date: string;
-    vote_average: number;
-    poster_path: string | null; // Poster path may be null if no poster is available
-  }
+interface TmdbMovie {
+  id: number;
+  title: string;
+  overview: string;
+  release_date: string;
+  vote_average: number;
+  poster_path: string | null;
+}
 
-  interface InputState {
-    title: string;
-    description: string;
-    releaseDate: string;
-    duration: string;
-    featured: boolean;
-    genre: string;
-    rating: string;
-  }
+interface InputState {
+  title: string;
+  description: string;
+  releaseDate: string;
+  duration: string;
+  featured: boolean;
+  genre: string;
+  rating: string;
+}
 
-  const TMDB_API_KEY = '446d69b8e014e2930a30c318caf3cfd1'; // Replace with your API key
+interface ValidationState {
+  title: boolean;
+  description: boolean;
+  releaseDate: boolean;
+  duration: boolean;
+  genre: boolean;
+  rating: boolean;
+}
 
-  const AddMovie = () => {
-    const [inputs, setInputs] = useState<InputState>({
-      title: '',
-      description: '',
-      releaseDate: '',
+const TMDB_API_KEY = '446d69b8e014e2930a30c318caf3cfd1';
+
+const AddMovie: React.FC = () => {
+  const [inputs, setInputs] = useState<InputState>({
+    title: '',
+    description: '',
+    releaseDate: '',
+    duration: '',
+    featured: false,
+    genre: '',
+    rating: ''
+  });
+
+  const [validations, setValidations] = useState<ValidationState>({
+    title: true,
+    description: true,
+    releaseDate: true,
+    duration: true,
+    genre: true,
+    rating: true
+  });
+
+  const [poster, setPoster] = useState<File | null>(null);
+  const [castPhotos, setCastPhotos] = useState<File[]>([]);
+  const [cast, setCast] = useState<string[]>([]);
+  const [newCastMember, setNewCastMember] = useState('');
+  const [tmdbQuery, setTmdbQuery] = useState('');
+  const [tmdbMovies, setTmdbMovies] = useState<TmdbMovie[]>([]);
+  const [selectedMovie, setSelectedMovie] = useState<TmdbMovie | null>(null);
+  const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Romance'];
+
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setInputs((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
+  };
+
+  const validateField = (name: string, value: string) => {
+    let isValid = true;
+    switch (name) {
+      case 'title':
+      case 'description':
+      case 'genre':
+        isValid = value.trim() !== '';
+        break;
+      case 'releaseDate':
+        isValid = /^\d{4}-\d{2}-\d{2}$/.test(value);
+        break;
+      case 'duration':
+        const duration = parseFloat(value);
+        isValid = !isNaN(duration) && duration >= 1.5 && duration <= 4.5;
+        break;
+      case 'rating':
+        const rating = parseFloat(value);
+        isValid = !isNaN(rating) && rating >= 0 && rating <= 9.9;
+        break;
+    }
+    setValidations((prev) => ({ ...prev, [name]: isValid }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      if (e.target.name === 'poster') {
+        setPoster(e.target.files[0]);
+      } else if (e.target.name === 'castPhotos') {
+        setCastPhotos(Array.from(e.target.files));
+      }
+    }
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputs((prev) => ({ ...prev, featured: e.target.checked }));
+  };
+
+  const handleCastChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewCastMember(e.target.value);
+  };
+
+  const addCastMember = () => {
+    if (newCastMember.trim()) {
+      setCast((prev) => [...prev, newCastMember.trim()]);
+      setNewCastMember('');
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    // Validate all fields before submission
+    let isValid = true;
+    Object.entries(inputs).forEach(([key, value]) => {
+      validateField(key, value.toString());
+      if (!validations[key as keyof ValidationState]) {
+        isValid = false;
+      }
+    });
+
+    if (!isValid) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Please fill in all required fields correctly.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    Object.entries(inputs).forEach(([key, value]) => {
+      formData.append(key, value.toString());
+    });
+    if (poster) formData.append('poster', poster);
+    castPhotos.forEach((photo) => formData.append('castPhotos', photo));
+    formData.append('cast', JSON.stringify(cast));
+
+    addMovie(formData)
+      .then((res) => {
+        console.log('Movie added:', res);
+        Swal.fire({
+          title: 'Success!',
+          text: 'Movie added successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+      })
+      .catch((err) => {
+        console.error('Error adding movie:', err);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to add movie. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      });
+  };
+
+  useEffect(() => {
+    getAllTheatres()
+      .then((data) => console.log(data.movies))
+      .catch(err => console.log(err));
+  }, []);
+
+  const handleTmdbSearch = () => {
+    if (!tmdbQuery) return;
+    fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${tmdbQuery}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.results) {
+          setTmdbMovies(data.results);
+          console.log("The TMDB API returned the following movies:", data.results);
+        }
+      })
+      .catch((err) => console.error('Error fetching TMDB movies:', err));
+  };
+
+  const selectTmdbMovie = (movie: TmdbMovie) => {
+    setSelectedMovie(movie);
+    setInputs({
+      title: movie.title,
+      description: movie.overview,
+      releaseDate: movie.release_date,
       duration: '',
       featured: false,
       genre: '',
-      rating: ''
+      rating: movie.vote_average.toFixed(1)
     });
-    
-    const [poster, setPoster] = useState<File | null>(null);
-    const [castPhotos, setCastPhotos] = useState<File[]>([]);
-    const [error] = useState('');
-    const [cast, setCast] = useState<string[]>([]);
-    const [newCastMember, setNewCastMember] = useState('');
-    const [tmdbQuery, setTmdbQuery] = useState('');
-    const [tmdbMovies, setTmdbMovies] = useState<TmdbMovie[]>([]);
-    const [selectedMovie, setSelectedMovie] = useState<TmdbMovie | null>(null);
-    const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Romance']; // Example genres
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files) {
-        if (e.target.name === 'poster') {
-          setPoster(e.target.files[0]);
-        } else if (e.target.name === 'castPhotos') {
-          setCastPhotos(Array.from(e.target.files)); // Store File objects for submission
-        }
-      }
-    };
-
-    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setInputs((prev) => ({ ...prev, featured: e.target.checked }));
-    };
-
-    const handleCastChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNewCastMember(e.target.value);
-    };
-
-    const addCastMember = () => {
-      if (newCastMember.trim()) {
-        setCast((prev) => [...prev, newCastMember.trim()]);
-        setNewCastMember('');
-      }
-    };
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const formData = new FormData();
-      formData.append('title', inputs.title);
-      formData.append('description', inputs.description);
-      formData.append('releaseDate', inputs.releaseDate);
-      formData.append('duration', inputs.duration);
-      formData.append('featured', String(inputs.featured));
-      if (poster) formData.append('poster', poster); // Include poster
-      castPhotos.forEach((photo) => formData.append('castPhotos', photo)); // Include cast photos
-      formData.append('genre', inputs.genre);
-      formData.append('rating', inputs.rating);
-      formData.append('cast', JSON.stringify(cast)); // Cast members
-
-      addMovie(formData)
-        .then((res) => {
-          console.log('Movie added:', res);
-          // Show SweetAlert on successful movie addition
-          Swal.fire({
-            title: 'Success!',
-            text: 'Movie added successfully!',
-            icon: 'success',
-            confirmButtonText: 'OK',
-          });
-        })
-        .catch((err) => {
-          console.error('Error adding movie:', err);
-          // Optionally show an error alert
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to add movie. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK',
-          });
-        });
-    };
-
-    useEffect(() => {
-      getAllTheatres()
-        .then((data) => console.log(data.movies))
-        .catch(err => console.log(err));
-    }, []);
-
-    const handleTmdbSearch = () => {
-      if (!tmdbQuery) return;
-      fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${tmdbQuery}`)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.results) {
-            setTmdbMovies(data.results);
-            console.log("The TMDB API returned the following movies:", data.results);
-          }
-        })
-        .catch((err) => console.error('Error fetching TMDB movies:', err));
-    };
-
-    const selectTmdbMovie = (movie: TmdbMovie) => {
-      setSelectedMovie(movie);
-      setInputs({
-        title: movie.title,
-        description: movie.overview,
-        releaseDate: movie.release_date,
-        duration: '',
-        featured: false,
-        genre: '',
-        rating: String(movie.vote_average)
-      });
-    };
-
-    return (
-      <form onSubmit={handleSubmit}>
-        <Box width={"50%"} padding="20px" margin="auto" display="flex" flexDirection="column" boxShadow="10px 10px 20px #ccc">
-          <Typography textAlign="center" variant="h5" fontFamily="Verdana">Add Movie</Typography>
-          {error && <Typography color="red">{error}</Typography>}
-
-          {/* TMDB Search Section */}
-          <TextField
-            label="Search Movie on TMDB"
-            variant="standard"
-            margin="normal"
-            value={tmdbQuery}
-            onChange={(e) => setTmdbQuery(e.target.value)}
-          />
-          <Button type="button" variant="contained" onClick={handleTmdbSearch}>Search</Button>
-
-          {/* Display TMDB Search Results */}
-          <Grid container spacing={2} marginTop={2}>
-            {tmdbMovies.map((movie, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card onClick={() => selectTmdbMovie(movie)} sx={{ cursor: 'pointer', height: '100%' }}>
-                  <CardMedia
-                    component="img"
-                    image={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                    alt={movie.title}
-                    sx={{ height: 300 }}
-                  />
-                  <CardContent>
-                    <Typography variant="h6">{movie.title}</Typography>
-                    <Typography variant="body2" color="textSecondary">{movie.release_date}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-
-          {/* Display Selected Movie Details */}
-        {selectedMovie && (
-          <Box marginTop={2}>
-            <Typography variant="h6">Selected Movie:</Typography>
-            <Typography>Title: {selectedMovie.title}</Typography>
-            <Typography>Description: {selectedMovie.overview}</Typography>
-            <Typography>Release Date: {selectedMovie.release_date}</Typography>
-            <Typography>Rating: {selectedMovie.vote_average}</Typography>
-          </Box>
-        )}
-
-          {/* Form Fields */}
-          <TextField name="title" label="Movie Title" variant="standard" margin="normal" value={inputs.title} onChange={handleChange} />
-          <TextField name="description" label="Description" variant="standard" margin="normal" value={inputs.description} onChange={handleChange} />
-          <TextField name="releaseDate" label="Release Date" type="date" variant="standard" margin="normal" value={inputs.releaseDate} onChange={handleChange} />
-          <TextField name="duration" label="Duration" variant="standard" margin="normal" value={inputs.duration} onChange={handleChange} />
-          <TextField
-            select
-            name="genre"
-            label="Genre"
-            variant="standard"
-            margin="normal"
-            value={inputs.genre}
-            onChange={handleChange}
-            SelectProps={{ native: true }}
-          >
-            <option value="" disabled>Select Genre</option>
-            {genres.map((genre, index) => (
-              <option key={index} value={genre}>{genre}</option>
-            ))}
-          </TextField>
-
-          <TextField
-            name="rating"
-            label="Rating"
-            type="number"
-            variant="standard"
-            margin="normal"
-            value={inputs.rating}
-            onChange={handleChange}
-            inputProps={{ min: 0, max: 10, step: 0.1 }}
-          />
-
-          <Checkbox name="featured" checked={inputs.featured} onChange={handleCheckboxChange} />
-          <Typography>Featured</Typography>
-
-          <label htmlFor="poster">Poster</label>
-          <input type="file" name="poster" accept="image/*" onChange={handleFileChange} />
-
-          <label htmlFor="castPhotos">Cast Photos</label>
-          <input type="file" name="castPhotos" accept="image/*" multiple onChange={handleFileChange} />
-
-          {/* Cast Members Section */}
-          <TextField
-            label="Add Cast Member"
-            variant="standard"
-            value={newCastMember}
-            onChange={handleCastChange}
-            onKeyDown={(e) => { if (e.key === 'Enter') addCastMember(); }}
-          />
-          <Button variant="contained" onClick={addCastMember}>Add Cast</Button>
-          <Typography>Cast: {cast.join(', ')}</Typography>
-
-          <Button type="submit" variant="contained" color="primary">Add Movie</Button>
-        </Box>
-      </form>
-    );
+    titleRef.current?.focus();
   };
 
-  export default AddMovie;
+  return (
+    <form onSubmit={handleSubmit} className={styles.add_movie_form}>
+      <h2 className={styles.title}>Add Movie</h2>
+
+      <div className={styles.field}>
+        <input
+          type="text"
+          placeholder="Search Movie on TMDB"
+          value={tmdbQuery}
+          onChange={(e) => setTmdbQuery(e.target.value)}
+          className={styles.input}
+        />
+        <button type="button" onClick={handleTmdbSearch} className={styles.button}>Search</button>
+      </div>
+
+      <div className={styles.gridContainer}>
+        {tmdbMovies.map((movie, index) => (
+          <div className={styles.card} key={index} onClick={() => selectTmdbMovie(movie)}>
+            <img
+              src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+              alt={movie.title}
+              className={styles.moviePoster}
+            />
+            <h3 className={styles.cardTitle}>{movie.title}</h3>
+          </div>
+        ))}
+      </div>
+
+      {selectedMovie && (
+      <div className={styles.selectedMovie}>
+        <h3 className={styles.selectedMovieTitle}>Selected Movie: {selectedMovie.title}</h3>
+        <p className={styles.selectedMovieDescription}>{selectedMovie.overview}</p>
+        {/* Banner for selected movie */}
+        <div className={styles.banner}>
+          <img
+            src={`https://image.tmdb.org/t/p/w500/${selectedMovie.poster_path}`}
+            alt={selectedMovie.title}
+            className={styles.bannerImage}
+          />
+        </div>
+      </div>
+    )}
+
+      <div className={styles.field}>
+        <input
+          type="text"
+          name="title"
+          placeholder="Movie Title"
+          value={inputs.title}
+          onChange={handleChange}
+          ref={titleRef}
+          className={`${styles.input} ${!validations.title ? styles.invalid : ''}`}
+        />
+      </div>
+
+      <div className={styles.field}>
+        <textarea
+          name="description"
+          placeholder="Movie Description"
+          value={inputs.description}
+          onChange={handleChange}
+          className={`${styles.textarea} ${!validations.description ? styles.invalid : ''}`}
+        />
+      </div>
+
+      <div className={styles.field}>
+        <input
+          type="date"
+          name="releaseDate"
+          value={inputs.releaseDate}
+          onChange={handleChange}
+          className={`${styles.input} ${!validations.releaseDate ? styles.invalid : ''}`}
+        />
+      </div>
+
+      <div className={styles.field}>
+        <input
+          type="number"
+          name="duration"
+          placeholder="Duration (1.5 - 4.5 hours)"
+          value={inputs.duration}
+          onChange={handleChange}
+          step="0.1"
+          min="1.5"
+          max="4.5"
+          className={`${styles.input} ${!validations.duration ? styles.invalid : ''}`}
+        />
+      </div>
+      
+      <div className={styles.field}>
+        <label>
+          <input
+            type="checkbox"
+            name="featured"
+            checked={inputs.featured}
+            onChange={handleCheckboxChange}
+            className={styles.checkbox}/>
+          Featured
+        </label>
+      </div>
+
+      <div className={styles.field}>
+        <select
+          name="genre"
+          value={inputs.genre}
+          onChange={handleChange}
+          className={`${styles.select} ${!validations.genre ? styles.invalid : ''}`}
+        >
+          <option value="">Select Genre</option>
+          {genres.map((genre) => (
+            <option key={genre} value={genre}>{genre}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className={styles.field}>
+        <input
+          type="number"
+          name="rating"
+          placeholder="Rating (0 - 9.9)"
+          value={inputs.rating}
+          onChange={handleChange}
+          step="0.1"
+          min="0"
+          max="9.9"
+          className={`${styles.input} ${!validations.rating ? styles.invalid : ''}`}
+        />
+      </div>
+
+      <div className={styles.field}>
+        <input
+          type="file"
+          name="poster"
+          onChange={handleFileChange}
+          className={styles.input}
+        />
+      </div>
+
+      <div className={styles.field}>
+        <input
+          type="text"
+          placeholder="Add Cast Member"
+          value={newCastMember}
+          onChange={handleCastChange}
+          className={styles.input}
+        />
+        <button type="button" onClick={addCastMember} className={styles.button}>Add Cast</button>
+      </div>
+
+      {cast.length > 0 && (
+        <div className={styles.castList}>
+          <h4>Cast:</h4>
+          <ul>
+            {cast.map((member, index) => (
+              <li key={index}>{member}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className={styles.field}>
+        <input
+          type="file"
+          name="castPhotos"
+          onChange={handleFileChange}
+          multiple
+          className={styles.input}
+        />
+      </div>
+
+      <button type="submit" className={styles.submitButton}>Add Movie</button>
+    </form>
+  );
+};
+
+export default AddMovie;
