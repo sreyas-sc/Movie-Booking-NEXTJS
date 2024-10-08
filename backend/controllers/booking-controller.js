@@ -37,6 +37,7 @@ async function sendWhatsappMessage(to, message, qrCodeUrl) {
       to: `whatsapp:${+918111904512}`, // Customer's WhatsApp number
       mediaUrl: [qrCodeUrl],
     });
+    console.log("response of twilio message", response)
   } catch (error) {
     console.error("Error sending WhatsApp message:", error);
     throw new Error("Error sending WhatsApp message");
