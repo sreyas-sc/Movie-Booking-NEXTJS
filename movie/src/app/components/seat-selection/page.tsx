@@ -316,7 +316,7 @@ const SeatSelection: React.FC = () => {
                   <Grid item key={seatLabel}>
                     <Button
                       variant="outlined"
-                      className={isBooked ? styles.booked : isSelected ? styles.selected : styles.available}
+                      className={`${isBooked ? styles.booked : isSelected ? styles.selected : styles.available} ${styles.seatButton}`}
                       onClick={() => !isBooked && handleSeatClick(seatLabel)} // Disable click if booked
                       disabled={isBooked} // Disable button if booked
                     >

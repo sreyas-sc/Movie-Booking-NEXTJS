@@ -195,7 +195,6 @@ export default function Homepage() {
       </Box>
     </Box>
 
-      {/* /////////////// */}
 
       <Box padding={5} margin='auto'>
         <Typography variant='h4' textAlign={"center"}>
@@ -217,7 +216,7 @@ export default function Homepage() {
             title={movie.title}
             posterUrl={movie.posterUrl}
             releaseDate={movie.releaseDate}
-            description={`Description for ${movie.title}`} // Placeholder description
+            description={``} // Placeholder description
             duration="N/A" // Adjust this if you have duration data
             genre={movie.genre}
             rating={movie.rating}

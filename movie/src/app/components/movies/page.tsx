@@ -15,6 +15,7 @@ const MoviePage = () => {
     genre: string;
     rating: number;
     duration: string;
+    description: string;
   }
 
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -103,7 +104,7 @@ const MoviePage = () => {
             title={movie.title}
             posterUrl={movie.posterUrl}
             releaseDate={movie.releaseDate}
-            description={`Description for ${movie.title}`} // Placeholder description
+            description={movie.description} // Placeholder description
             duration={movie.duration}
             genre={movie.genre}
             rating={movie.rating}

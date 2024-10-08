@@ -31,27 +31,34 @@ Define your seat styles here
   margin: 4px;
 }
 
-
 .seatButton {
-    min-width: 0;
-    width: 100%;
-    height: 40px;
-    margin: 2px;
-    font-size: 0.75rem;
-  }
-  
+  min-width: 40px; /* Minimum width for the button */
+  height: 40px; /* Fixed height for buttons */
+  margin: 2px; /* Margin for spacing between buttons */
+  font-size: 0.75rem; /* Font size for seat labels */
+}
 
-  @media (max-width: 1200px) {
-    .seatButton {
-      height: 30px; 
-      font-size: 0.6rem; 
-    }
+/* Responsive styles for different screen sizes */
+@media (max-width: 1200px) {
+  .seatButton {
+    width: 30px; /* Reduce width on smaller screens */
+    height: 30px; /* Adjust height for smaller buttons */
+    font-size: 0.65rem; /* Smaller font size */
   }
-  
-  @media (max-width: 768px) {
-    .seatButton {
-      height: 25px;
-      font-size: 0.5rem; 
-    }
+}
+
+@media (max-width: 768px) {
+  .seatButton {
+    width: 25px; /* Further reduce width for even smaller screens */
+    height: 25px; /* Further adjust height */
+    font-size: 0.55rem; /* Even smaller font size */
   }
+}
   
+@media (max-width: 480px) {
+  .seatButton {
+    width: 20px; /* Minimum width for mobile */
+    height: 20px; /* Minimum height for mobile */
+    font-size: 0.5rem; /* Minimum font size for mobile */
+  }
+}
