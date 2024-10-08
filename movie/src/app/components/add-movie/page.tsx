@@ -59,6 +59,7 @@ const AddMovie: React.FC = () => {
   const [castPhotos, setCastPhotos] = useState<File[]>([]);
   const [cast, setCast] = useState<string[]>([]);
   const [newCastMember, setNewCastMember] = useState('');
+  const [posterPreview, setPosterPreview] = useState<string | null>(null); // New state for preview
   const [tmdbQuery, setTmdbQuery] = useState('');
   const [tmdbMovies, setTmdbMovies] = useState<TmdbMovie[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<TmdbMovie | null>(null);
@@ -94,11 +95,12 @@ const AddMovie: React.FC = () => {
     }
     setValidations((prev) => ({ ...prev, [name]: isValid }));
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       if (e.target.name === 'poster') {
-        setPoster(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        setPoster(selectedFile);
+        setPosterPreview(URL.createObjectURL(selectedFile)); // Set the preview URL
       } else if (e.target.name === 'castPhotos') {
         setCastPhotos(Array.from(e.target.files));
       }
@@ -348,6 +350,12 @@ const AddMovie: React.FC = () => {
           className={styles.input}
         />
       </div>
+
+      {posterPreview && (
+        <div className={styles.imagePreview}>
+          <Image height={450} width={450} src={posterPreview} alt="Poster Preview" className={styles.previewImg} />
+        </div>
+      )}
 
       <div className={styles.field}>
         <input
