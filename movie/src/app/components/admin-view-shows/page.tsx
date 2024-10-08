@@ -74,7 +74,7 @@ const AdminShowsPage = () => {
         {shows.map((show) => {
           // Construct image URL, adding a fallback
           const posterUrl = show.movieId.posterUrl 
-            ? `http://localhost:5000/uploads/${show.movieId.posterUrl.split('\\').pop()}` 
+            ? `https://movie-booking-nextjs.onrender.com/uploads/${show.movieId.posterUrl.split('\\').pop()}` 
             : '/default-image.jpg';
 
           return (

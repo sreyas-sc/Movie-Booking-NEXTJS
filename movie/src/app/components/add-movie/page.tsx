@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { addMovie, getAllTheatres } from '@/app/api-helpers/api-helpers';
 import Swal from 'sweetalert2';
 import styles from './add-movie.module.css';
+import Image from 'next/image';
 
 interface TmdbMovie {
   id: number;
@@ -221,7 +222,7 @@ const AddMovie: React.FC = () => {
       <div className={styles.gridContainer}>
         {tmdbMovies.map((movie, index) => (
           <div className={styles.card} key={index} onClick={() => selectTmdbMovie(movie)}>
-            <img
+            <Image
               src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
               alt={movie.title}
               className={styles.moviePoster}
@@ -237,7 +238,7 @@ const AddMovie: React.FC = () => {
         <p className={styles.selectedMovieDescription}>{selectedMovie.overview}</p>
         {/* Banner for selected movie */}
         <div className={styles.banner}>
-          <img
+          <Image
             src={`https://image.tmdb.org/t/p/w500/${selectedMovie.poster_path}`}
             alt={selectedMovie.title}
             className={styles.bannerImage}
