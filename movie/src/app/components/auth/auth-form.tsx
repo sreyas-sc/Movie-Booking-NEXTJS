@@ -180,6 +180,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
     }
   };
 
+ 
+
   return (
     <>
       <Dialog PaperProps={{ style: { borderRadius: 20 } }} open={true}>
@@ -271,15 +273,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
             >
               {isSignup ? "Sign Up" : "Sign In"}
             </Button>
-            
-            {/* <Typography variant="body1" marginTop={2}>
-              {isSignup ? "Already have an account?" : "Don't have an account?"}
-              <Button onClick={() => setIsSignup((prev) => !prev)}>
-                {isSignup ? "Sign In" : "Sign Up"}
-              </Button>
-            </Typography> */}
-
-              {!isAdmin && (
+                 {!isAdmin && (
                 
                   <Typography variant="body1" marginTop={2}>
                     {isSignup ? "Already have an account?" : "Don't have an account?"}
