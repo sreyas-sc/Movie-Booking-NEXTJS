@@ -4,6 +4,7 @@ import { Box, Card, CardContent, CardHeader, Grid, Typography } from '@mui/mater
 import React, { useEffect, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
+
 interface Booking {
   _id: string;
   movieName: string;

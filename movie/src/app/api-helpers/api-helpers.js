@@ -12,12 +12,13 @@ export const getAllMovies = async (filters = {}) => {
 
     if (res.status !== 200) {
       console.log("No Data");
-      return;
+      return { movies: [] };
     }
     const data = await res.data;
     return data;
   } catch (err) {
     console.log("Error: ", err.message);
+    return { movies: [] };
   }
 };
 

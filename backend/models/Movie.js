@@ -37,6 +37,10 @@ const movieSchema = new mongoose.Schema({
         type: [String],
         required: true,
     },
+    castPhotos: {
+        type: [String],
+        required: false,
+    },
     featured: {
         type: Boolean,
         default: false,
@@ -50,4 +54,3 @@ const movieSchema = new mongoose.Schema({
 });
 
 export default mongoose.model("Movie", movieSchema);
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

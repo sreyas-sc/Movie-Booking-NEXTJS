@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Card, CardActions, CardContent, CardMedia, Typography, Button, Modal, Box } from '@mui/material';
+import { Card, CardActions, CardContent, CardMedia, Typography, Button, Modal, Box, Grid } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface MovieCardProps {
   title: string;
@@ -11,17 +12,18 @@ interface MovieCardProps {
   id: string;
   genre: string;
   rating: number;
+  cast: string[];
+  castPhotos?: string[];
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, posterUrl, duration, id, genre, rating }) => {
+const MovieCard: React.FC<MovieCardProps> = ({ 
+  title, description, releaseDate, posterUrl, duration, id, genre, rating, cast, castPhotos 
+}) => {
   const router = useRouter();
-  const [open, setOpen] = useState(false); // State to manage modal visibility
+  const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const isUserLoggedIn = Boolean(localStorage.getItem('userId'));
-  const isAdminLoggedIn = Boolean(localStorage.getItem('adminId'));
 
   const handleClick = () => {
     const userId = localStorage.getItem('userId');
@@ -49,10 +51,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
           transition: '0.3s',
           '&:hover': {
             boxShadow: "10px 10px 20px #ccc",
-            cursor: 'pointer' // Change cursor to pointer
+            cursor: 'pointer'
           }
         }}
-        onClick={handleOpen} // Open modal on card click
+        onClick={handleOpen}
       >
         <CardMedia
           component="img"
@@ -65,7 +67,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
             {title}
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            {description.length > 50 ? `${description.substring(0, 50)}...` : description} {/* Show truncated description */}
+            {description.length > 50 ? `${description.substring(0, 50)}...` : description}
           </Typography>
           <Typography variant='body2' color='text.secondary'>
             Release Date: {new Date(releaseDate).toLocaleDateString()}
@@ -80,27 +82,27 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
             Genre: {genre}
           </Typography>
         </CardContent>
-        {isUserLoggedIn && !isAdminLoggedIn && (
-          <CardActions sx={{ justifyContent: 'center', paddingBottom: 2 }}>
-            <Button
-              onClick={handleClick}
-              sx={{
-                color: "white",
-                borderRadius: "8px",
-                backgroundColor: "rgba(248, 68, 100, 1)",
-                border: "1px solid rgba(245, 255, 255, 0.5)",
-                '&:hover': {
-                  backgroundColor: "rgba(248, 68, 100, 0.9)",
-                }
-              }}
-            >
-              Book Tickets
-            </Button>
-          </CardActions>
-        )}
+        <CardActions sx={{ justifyContent: 'center', paddingBottom: 2 }}>
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick();
+            }}
+            sx={{
+              color: "white",
+              borderRadius: "8px",
+              backgroundColor: "rgba(248, 68, 100, 1)",
+              border: "1px solid rgba(245, 255, 255, 0.5)",
+              '&:hover': {
+                backgroundColor: "rgba(248, 68, 100, 0.9)",
+              }
+            }}
+          >
+            Book Tickets
+          </Button>
+        </CardActions>
       </Card>
 
-      {/* Modal for movie details */}
       <Modal
         open={open}
         onClose={handleClose}
@@ -112,46 +114,96 @@ const MovieCard: React.FC<MovieCardProps> = ({ title, description, releaseDate, 
           top: '50%', 
           left: '50%', 
           transform: 'translate(-50%, -50%)', 
-          width: '80%',  
-          maxWidth: 800, 
+          width: '90%',  
+          maxWidth: 1000, 
+          maxHeight: '90vh',
           bgcolor: 'background.paper', 
           boxShadow: 24, 
           p: 4,
           borderRadius: 2,
-          display: 'flex', 
-          flexDirection: 'row', 
+          overflowY: 'auto'
         }}>
-          <CardMedia
-            component="img"
-            height={200}
-            image={imageUrl}
-            alt={title}
-            sx={{ 
-              height: '50%',
-              width: '50%', 
-              marginRight: 2, 
-            }}
-          />
-          <Box sx={{ flex: 1 }}> {/* Box to hold text details */}
-            <Typography id="modal-title" variant="h6" component="h2" gutterBottom>
-              {title}
-            </Typography>
-            <Typography id="modal-description" variant="body2" color='text.secondary' paragraph>
-              {description}
-            </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              Release Date: {new Date(releaseDate).toLocaleDateString()}
-            </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              Duration: {duration} hours
-            </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              IMDB Rating: {rating}
-            </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              Genre: {genre}
-            </Typography>
-            <Button onClick={handleClose} sx={{ marginTop: 2 }} variant="contained">Close</Button>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <CardMedia
+                component="img"
+                image={imageUrl}
+                alt={title}
+                sx={{ 
+                  width: '100%',
+                  height: 'auto',
+                  objectFit: 'cover',
+                  borderRadius: 2,
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography id="modal-title" variant="h4" component="h2" gutterBottom>
+                {title}
+              </Typography>
+              <Typography id="modal-description" variant="body1" paragraph>
+                {description}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Release Date: {new Date(releaseDate).toLocaleDateString()}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Duration: {duration} hours
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                IMDB Rating: {rating}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Genre: {genre}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Cast section */}
+          <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>Cast</Typography>
+          <Grid container spacing={2}>
+            {cast && cast.length > 0 ? (
+              cast.map((member, index) => (
+                <Grid item xs={6} sm={4} md={3} key={index}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    {castPhotos && castPhotos[index] ? (
+                      <Image
+                        src={`https://movie-booking-nextjs.onrender.com/uploads/${castPhotos[index].split('\\').pop()}`}
+                        alt={member}
+                        width={100}
+                        height={100}
+                        style={{ borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: '50%',
+                          bgcolor: 'grey.300',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: 'auto'
+                        }}
+                      >
+                        {member.charAt(0)}
+                      </Box>
+                    )}
+                    <Typography variant="body2" sx={{ mt: 1 }}>{member}</Typography>
+                  </Box>
+                </Grid>
+              ))
+            ) : (
+              <Typography variant="body2" sx={{ mt: 2, ml: 2 }}>
+                No cast information available.
+              </Typography>
+            )}
+          </Grid>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+            <Button onClick={handleClose} variant="outlined">Close</Button>
+            <Button onClick={handleClick} variant="contained" color="primary">Book Tickets</Button>
           </Box>
         </Box>
       </Modal>

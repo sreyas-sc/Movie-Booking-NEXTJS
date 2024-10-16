@@ -16,8 +16,8 @@ interface UpcomingMovie {
   poster_path: string;
   original_language: string;
   release_date: string;
-  genre: string;
-  duration: string; 
+  
+
 }
 
 interface UpcomingMovieResponse {
@@ -29,9 +29,12 @@ interface Movie {
   title: string;
   posterUrl: string;
   releaseDate: string;
-  rating:  number;
+  rating: number;
   genre: string;
-
+  description?: string;
+  duration?: string;
+  cast?: string[]; // Optional cast
+  castPhotos?: string[]; // Optional castPhotos
 }
 
 export default function Homepage() {
@@ -89,7 +92,13 @@ export default function Homepage() {
     getAllMovies()
       .then((data) => setMovies(data.movies)) // Ensure that data.movies matches the Movie interface
       .catch(err => console.log(err));
+
+      console.log(movies)  
   }, []);
+
+  useEffect(()=>{
+    console.log("The movies are....................")
+  })
 
   useEffect(() => {
     axios
@@ -104,8 +113,11 @@ export default function Homepage() {
       })
       .catch((error) => {
         console.error("Error fetching upcoming movies:", error);
+        
       });
   }, []);
+
+  
 
   
 
@@ -137,6 +149,8 @@ export default function Homepage() {
           }}
         />
       </div>
+
+     
 
             {/* Left & Right Buttons */}
         <Button
@@ -209,19 +223,22 @@ export default function Homepage() {
         padding={5}
         flexWrap='wrap'>
         
-        {movies && movies.slice(0,4).map((movie) => (
-          <MovieCard
-            key={movie._id}
-            id={movie._id}
-            title={movie.title}
-            posterUrl={movie.posterUrl}
-            releaseDate={movie.releaseDate}
-            description={``} // Placeholder description
-            duration="N/A" // Adjust this if you have duration data
-            genre={movie.genre}
-            rating={movie.rating}
-          />
-        ))}
+                  {movies && movies.slice(0, 4).map((movie) => (
+            <MovieCard
+              key={movie._id}
+              id={movie._id}
+              title={movie.title}
+              posterUrl={movie.posterUrl}
+              releaseDate={movie.releaseDate}
+              description={movie.description || ""} // Default empty string
+              duration={movie.duration || "N/A"} // Default value
+              genre={movie.genre}
+              rating={movie.rating}
+              cast={movie.cast || []} // Ensure 'cast' is an array
+              castPhotos={movie.castPhotos || []} // Ensure 'castPhotos' is an array
+            />
+          ))}
+
       </Box>
 
       <Box display="flex" justifyContent="center" padding={5}>

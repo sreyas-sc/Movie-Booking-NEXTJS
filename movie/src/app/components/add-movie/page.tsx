@@ -59,10 +59,14 @@ const AddMovie: React.FC = () => {
   const [castPhotos, setCastPhotos] = useState<File[]>([]);
   const [cast, setCast] = useState<string[]>([]);
   const [newCastMember, setNewCastMember] = useState('');
+  const [posterPreview, setPosterPreview] = useState<string | null>(null); // New state for preview
   const [tmdbQuery, setTmdbQuery] = useState('');
   const [tmdbMovies, setTmdbMovies] = useState<TmdbMovie[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<TmdbMovie | null>(null);
   const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Romance'];
+
+
+  const [castPhotosPreviews, setCastPhotosPreviews] = useState<string[]>([]);
 
   const titleRef = useRef<HTMLInputElement>(null);
 
@@ -94,15 +98,24 @@ const AddMovie: React.FC = () => {
     }
     setValidations((prev) => ({ ...prev, [name]: isValid }));
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       if (e.target.name === 'poster') {
-        setPoster(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        setPoster(selectedFile);
+        setPosterPreview(URL.createObjectURL(selectedFile));
       } else if (e.target.name === 'castPhotos') {
-        setCastPhotos(Array.from(e.target.files));
+        const selectedFiles = Array.from(e.target.files);
+        setCastPhotos(prevPhotos => [...prevPhotos, ...selectedFiles]);
+        const newPreviews = selectedFiles.map(file => URL.createObjectURL(file));
+        setCastPhotosPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
       }
     }
+  };
+
+  const removeCastPhoto = (index: number) => {
+    setCastPhotos(prevPhotos => prevPhotos.filter((_, i) => i !== index));
+    setCastPhotosPreviews(prevPreviews => prevPreviews.filter((_, i) => i !== index));
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,7 +160,10 @@ const AddMovie: React.FC = () => {
       formData.append(key, value.toString());
     });
     if (poster) formData.append('poster', poster);
-    castPhotos.forEach((photo) => formData.append('castPhotos', photo));
+    castPhotos.forEach((photo, index) => {
+      formData.append(`castPhotos`, photo);
+    });
+
     formData.append('cast', JSON.stringify(cast));
 
     addMovie(formData)
@@ -220,16 +236,21 @@ const AddMovie: React.FC = () => {
       </div>
 
       <div className={styles.gridContainer}>
-        {tmdbMovies.map((movie, index) => (
-          <div className={styles.card} key={index} onClick={() => selectTmdbMovie(movie)}>
-            <Image
-              src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-              alt={movie.title}
-              className={styles.moviePoster}
-            />
-            <h3 className={styles.cardTitle}>{movie.title}</h3>
-          </div>
-        ))}
+      {tmdbMovies.map((movie, index) => (
+  <div className={styles.card} key={index} onClick={() => selectTmdbMovie(movie)}>
+    <img
+      src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+      alt={movie.title}
+      onError={(e) => {
+        // Fallback to a placeholder image when the URL is broken
+        e.currentTarget.src = "https://via.placeholder.com/500";
+      }}
+      className={styles.moviePoster}
+    />
+    <h3 className={styles.cardTitle}>{movie.title}</h3>
+  </div>
+))}
+
       </div>
 
       {selectedMovie && (
@@ -239,6 +260,8 @@ const AddMovie: React.FC = () => {
         {/* Banner for selected movie */}
         <div className={styles.banner}>
           <Image
+            width={50}
+            height={50}
             src={`https://image.tmdb.org/t/p/w500/${selectedMovie.poster_path}`}
             alt={selectedMovie.title}
             className={styles.bannerImage}
@@ -342,6 +365,12 @@ const AddMovie: React.FC = () => {
         />
       </div>
 
+      {posterPreview && (
+        <div className={styles.imagePreview}>
+          <Image height={450} width={450} src={posterPreview} alt="Poster Preview" className={styles.previewImg} />
+        </div>
+      )}
+
       <div className={styles.field}>
         <input
           type="text"
@@ -364,15 +393,29 @@ const AddMovie: React.FC = () => {
         </div>
       )}
 
-      <div className={styles.field}>
+<div className={styles.field}>
         <input
           type="file"
           name="castPhotos"
           onChange={handleFileChange}
           multiple
+          accept="image/*"
           className={styles.input}
         />
       </div>
+
+      {castPhotosPreviews.length > 0 && (
+        <div className={styles.castPhotosPreviews}>
+          {castPhotosPreviews.map((preview, index) => (
+            <div key={index} className={styles.castPhotoPreview}>
+              <Image width={100} height={100} src={preview} alt={`Cast member ${index + 1}`} />
+              <button type="button" onClick={() => removeCastPhoto(index)} className={styles.removePhotoButton}>
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <button type="submit" className={styles.submitButton}>Add Movie</button>
     </form>

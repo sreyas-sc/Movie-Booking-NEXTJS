@@ -16,6 +16,8 @@ const MoviePage = () => {
     rating: number;
     duration: string;
     description: string;
+    cast: string[];        // Added cast
+    castPhotos?: string[]; 
   }
 
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -108,6 +110,8 @@ const MoviePage = () => {
             duration={movie.duration}
             genre={movie.genre}
             rating={movie.rating}
+            cast={movie.cast} 
+            castPhotos={movie.castPhotos}
           />
         ))}
       </Box>
