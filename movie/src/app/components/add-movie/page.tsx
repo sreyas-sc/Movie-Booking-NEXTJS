@@ -160,7 +160,7 @@ const AddMovie: React.FC = () => {
       formData.append(key, value.toString());
     });
     if (poster) formData.append('poster', poster);
-    castPhotos.forEach((photo, index) => {
+    castPhotos.forEach((photo) => {
       formData.append(`castPhotos`, photo);
     });
 

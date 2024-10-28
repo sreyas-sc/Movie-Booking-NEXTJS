@@ -139,7 +139,7 @@ const SeatSelection: React.FC = () => {
   
   const proceedBooking = async () => {
     try {
-      const response = await fetch('https://movie-booking-nextjs.onrender.com/booking/razorpay', {
+      const response = await fetch('http://localhost:5000/booking/razorpay', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ const SeatSelection: React.FC = () => {
     console.log('Payment successful!');
 
     // Send booking data to the backend after successful payment
-    const bookingResponse = await fetch('https://movie-booking-nextjs.onrender.com/booking/book', {
+    const bookingResponse = await fetch('http://localhost:5000/booking/book', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

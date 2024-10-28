@@ -89,7 +89,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
       const { email } = decoded;
 
       try {
-        await axios.post("https://movie-booking-nextjs.onrender.com/user/send-otp", { email });
+        await axios.post("http://localhost:5000/user/send-otp", { email });
         const response = await googleSignIn(email);
 
         if (response) {
@@ -119,7 +119,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
         throw new Error("Email or OTP is missing.");
       }
 
-      const response = await axios.post("https://movie-booking-nextjs.onrender.com/user/verify-otp", { email, otp: inputs.otp });
+      const response = await axios.post("http://localhost:5000/user/verify-otp", { email, otp: inputs.otp });
 
       if (response.data.success) {
         sessionStorage.removeItem("googleEmail");
