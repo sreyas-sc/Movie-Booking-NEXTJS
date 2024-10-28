@@ -1,29 +1,24 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, Grid } from '@mui/material';
-import toast from 'react-hot-toast'; 
-import styles from './seat.module.css';
+import { Typography, Button, Box } from '@mui/material';
+import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 import { useRouter } from "next/navigation";
+import { Armchair, ArmchairIcon } from 'lucide-react';
 import { checkSeatAvailability } from '@/app/api-helpers/api-helpers.js';
+import styles from './seat.module.css'
 
-
-
-
-// Interface for Razorpay payment response
 interface RazorpayPaymentResponse {
   razorpay_payment_id: string;
   razorpay_order_id: string;
   razorpay_signature: string;
 }
 
-// Interface for theater details
 interface TheaterDetails {
   name: string;
   place: string;
 }
 
-// Interface for Razorpay options
 interface RazorpayOptions {
   key: string;
   amount: number;
@@ -42,8 +37,7 @@ interface RazorpayOptions {
   };
 }
 
-// Main SeatSelection component
-const SeatSelection: React.FC = () => {
+const SeatSelection = () => {
   const router = useRouter();
   const [seatLayout, setSeatLayout] = useState<string[][]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Set<string>>(new Set());
@@ -53,7 +47,6 @@ const SeatSelection: React.FC = () => {
   const [movieId, setMovieId] = useState<string | null>(null);
   const [selectedTimes, setSelectedTimes] = useState<{ [key: string]: string | null }>({});
   const [bookedSeats, setBookedSeats] = useState<Set<string>>(new Set());
-
 
   useEffect(() => {
     const movieNameFromStorage = localStorage.getItem('selectedMovie');
@@ -74,45 +67,38 @@ const SeatSelection: React.FC = () => {
     }
 
     const fetchBookedSeats = async () => {
-      const selectedTimesString = localStorage.getItem('selectedTimes');  
+      const selectedTimesString = localStorage.getItem('selectedTimes');
       if (selectedTimesString) {
         const selectedTimes = JSON.parse(selectedTimesString);
-        const time = selectedTimes[Object.keys(selectedTimes)[0]];  
-       
-      if (movieId && savedTheater && savedDate && time) {
-        const booked = await checkSeatAvailability({
-          movieId,
-          theaterId: savedTheater.split('-')[0],
-          date: savedDate,
-          time: Object.values(selectedTimes).join(', '),
-        });
-        setBookedSeats(new Set(booked));
+        const time = selectedTimes[Object.keys(selectedTimes)[0]];
+
+        if (movieId && savedTheater && savedDate && time) {
+          const booked = await checkSeatAvailability({
+            movieId,
+            theaterId: savedTheater.split('-')[0],
+            date: savedDate,
+            time: Object.values(selectedTimes).join(', '),
+          });
+          setBookedSeats(new Set(booked));
+        }
       }
-    }
     };
 
     fetchBookedSeats();
   }, []);
 
-
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
-    script.onload = () => {
-      console.log('Razorpay script loaded successfully.');
-    };
-    script.onerror = () => {
-      console.error('Failed to load Razorpay script.');
-    };
     document.body.appendChild(script);
-
     return () => {
       document.body.removeChild(script);
     };
   }, []);
-  
+
   const handleSeatClick = (seatLabel: string) => {
+    if (bookedSeats.has(seatLabel)) return;
     setSelectedSeats(prev => {
       const newSelection = new Set(prev);
       if (newSelection.has(seatLabel)) {
@@ -124,22 +110,43 @@ const SeatSelection: React.FC = () => {
     });
   };
 
+  const generateSeatLayout = (seatNumbers: number[]): string[][] => {
+    const seatLabels: string[] = [];
+    let index = 0;
+
+    for (let i = 0; i < seatNumbers.length; i++) {
+      if (seatNumbers[i] === 1) {
+        const rowLabel = String.fromCharCode(65 + Math.floor(index / 20));
+        const seatNumber = (index % 20) + 1;
+        seatLabels.push(`${rowLabel}${seatNumber}`);
+        index++;
+      }
+    }
+
+    const result: string[][] = [];
+    for (let i = 0; i < Math.ceil(seatLabels.length / 20); i++) {
+      result.push(seatLabels.slice(i * 20, i * 20 + 20));
+    }
+
+    return result;
+  };
+
   const handleBookSeats = () => {
     const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js'; // Razorpay script URL
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
-    script.onload = () => proceedBooking(); // Proceed to booking once Razorpay is loaded
+    script.onload = () => proceedBooking();
     script.onerror = () => {
       console.error('Failed to load Razorpay.');
       toast.error('Failed to load payment gateway.');
     };
     document.body.appendChild(script);
-    proceedBooking(); // Proceed if Razorpay is already loaded
+    proceedBooking();
   };
-  
+
   const proceedBooking = async () => {
     try {
-      const response = await fetch('http://localhost:5000/booking/razorpay', {
+      const response = await fetch('https://movie-booking-nextjs.onrender.com/booking/razorpay', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,71 +161,67 @@ const SeatSelection: React.FC = () => {
           seatNumbers: Array.from(selectedSeats),
           totalAmount: totalCost,
           userId: localStorage.getItem('userId'),
-          amount: totalCost * 100, // Razorpay amount in paise
+          amount: totalCost * 100,
           currency: 'INR',
         }),
       });
-      
+
       const data = await response.json();
       if (!data || !data.orderId) {
         console.error('Order creation failed:', data);
         toast.error('Failed to create booking order.');
         return;
       }
-  
+
       const options: RazorpayOptions = {
-  key: data.key,
-  amount: data.amount,
-  currency: data.currency,
-  name: 'Movie Booking',
-  description: 'Seat Booking',
-  order_id: data.orderId,
-  handler: async (response: RazorpayPaymentResponse) => {
-    console.log('Payment successful!');
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Movie Booking',
+        description: 'Seat Booking',
+        order_id: data.orderId,
+        handler: async (response: RazorpayPaymentResponse) => {
+          console.log('Payment successful!');
+          const bookingResponse = await fetch('https://movie-booking-nextjs.onrender.com/booking/book', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              movieName,
+              movieId,
+              userId: localStorage.getItem('userId'),
+              theaterName: selectedTheater?.split('-')[1] || '',
+              theaterId: selectedTheater?.split('-')[0] || '',
+              date: selectedDate,
+              time: Object.values(selectedTimes).join(', '),
+              seatNumbers: Array.from(selectedSeats),
+              totalAmount: totalCost,
+              paymentId: response.razorpay_payment_id,
+            }),
+          });
 
-    // Send booking data to the backend after successful payment
-    const bookingResponse = await fetch('http://localhost:5000/booking/book', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        movieName,
-        movieId,
-        userId: localStorage.getItem('userId'),
-        theaterName: selectedTheater?.split('-')[1] || '',
-        theaterId: selectedTheater?.split('-')[0] || '',
-        date: selectedDate,
-        time: Object.values(selectedTimes).join(', '),
-        seatNumbers: Array.from(selectedSeats),
-        totalAmount: totalCost, // Total cost in rupees
-        paymentId: response.razorpay_payment_id, // Razorpay payment ID
-      }),
-    });
+          const bookingData = await bookingResponse.json();
+          if (bookingData) {
+            Swal.fire({
+              title: "Payment Done!",
+              text: "The movie booking is completed",
+              icon: "success"
+            });
+            router.push('/components/user-profile');
+          }
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: '',
+        },
+        theme: {
+          color: '#F37254',
+        },
+      };
 
-    const bookingData = await bookingResponse.json();
-    if (bookingData) {
-      Swal.fire({
-        title: "Payment Done!",
-        text: "The movie booking is completed",
-        icon: "success"
-      });
-
-      // Redirect the user to the 'Add Theatre' page after successful payment
-      router.push('/components/user-profile');
-    }
-  },
-  prefill: {
-    name: '', // Prefill user details if available
-    email: '',
-    contact: '',
-  },
-  theme: {
-    color: '#F37254',
-  },
-};
-
-      const payment = new (window as { Razorpay: new (options: RazorpayOptions) => { open: () => void } }).Razorpay(options); 
+      const payment = new (window as any).Razorpay(options);
       payment.open();
     } catch (error) {
       console.error('Failed to create Razorpay order:', error);
@@ -226,29 +229,6 @@ const SeatSelection: React.FC = () => {
     }
   };
 
-  const generateSeatLayout = (seatNumbers: number[]): string[][] => {
-    const seatLabels: string[] = [];
-    let index = 0;
-
-    // Generate seat labels based on seat numbers
-    for (let i = 0; i < seatNumbers.length; i++) {
-      if (seatNumbers[i] === 1) {
-        const rowLabel = String.fromCharCode(65 + Math.floor(index / 20)); // 20 seats per row
-        const seatNumber = (index % 20) + 1;
-        seatLabels.push(`${rowLabel}${seatNumber}`);
-        index++;
-      }
-    }
-
-    // Split the seat labels into rows
-    const result: string[][] = [];
-    for (let i = 0; i < Math.ceil(seatLabels.length / 20); i++) {
-      result.push(seatLabels.slice(i * 20, i * 20 + 20)); // 20 seats per row
-    }
-
-    return result;
-  };
-  
   const seatCost = 120;
   const totalCost = selectedSeats.size * seatCost;
 
@@ -265,81 +245,129 @@ const SeatSelection: React.FC = () => {
   const getTheaterDetails = (theater: string | null): TheaterDetails => {
     if (!theater) return { name: '', place: '' };
     const parts = theater.split('-');
-    const name = parts[1] || '';
-    const place = parts[2] || '';
-    return { name, place };
+    return { 
+      name: parts[1] || '',
+      place: parts[2] || ''
+    };
   };
 
   const { name: theaterName, place: theaterPlace } = getTheaterDetails(selectedTheater);
 
-  return (
-    <div>
-      <Typography variant="h4" textAlign={'center'} padding={3}>
-        Select Seats
-      </Typography>
-
-      <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
-        <Typography variant="h6">
-          Movie: {movieName}
-        </Typography>
-        <Typography variant="h6">
-          Theater: {theaterName} - {theaterPlace}
-        </Typography>
-        <Typography variant="h6">
-          Date: {formatDate(selectedDate)}
-        </Typography>
-
-        <Box
-          sx={{
-            border: '1px solid white',
-            borderRadius: '4px',
-            padding: '16px',
-            marginTop: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            width: '100%',
-            maxWidth: '400px',
-          }}
-        >
-          <Typography variant="h5" color={"white"}>
-            Total Amount: ₹{totalCost} 
-          </Typography>
-        </Box>
-
-        <Grid container spacing={2}>
-          {seatLayout.map((row, rowIndex) => (
-            <Grid container item key={rowIndex} justifyContent="center">
-              {row.map((seatLabel) => {
-                const isSelected = selectedSeats.has(seatLabel);
-                const isBooked = bookedSeats.has(seatLabel); // Check if the seat is booked
-                return (
-                  <Grid item key={seatLabel}>
-                    <Button
-                      variant="outlined"
-                      className={`${isBooked ? styles.booked : isSelected ? styles.selected : styles.available} ${styles.seatButton}`}
-                      onClick={() => !isBooked && handleSeatClick(seatLabel)} // Disable click if booked
-                      disabled={isBooked} // Disable button if booked
-                    >
-                      {seatLabel}
-                    </Button>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          ))}
-        </Grid>
-
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleBookSeats}
-          disabled={selectedSeats.size === 0}
-          sx={{ mt: 3 }}
-        >
-          Book Seats
-        </Button>
-      </Box>
+  // const SeatIcon = ({ label, isSelected, isBooked }: { label: string; isSelected: boolean; isBooked: boolean }) => (
+  //   <div className="flex flex-col items-center m-2">
+  //     <Button
+  //       variant="contained"
+  //       disabled={isBooked}
+  //       onClick={() => handleSeatClick(label)}
+  //       sx={{
+  //         backgroundColor: isBooked ? 'red' : isSelected ? 'green' : '#1976d2',
+  //         color: 'white',
+  //         '&:hover': {
+  //           backgroundColor: isBooked ? 'darkred' : isSelected ? 'darkgreen' : '#1565c0',
+  //         },
+  //         width: '40px',
+  //         height: '40px',
+  //       }}
+  //     >
+  //       {/* {label} */}
+  //       <ArmchairIcon/>
+  //     </Button>
+  //     <Typography variant="caption" sx={{ color: isBooked ? 'red' : 'black' }}>
+  //       {isBooked ? 'Booked' : isSelected ? 'Selected' : 'Available'}
+  //     </Typography>
+  //   </div>
+  // );
+  const SeatIcon = ({ label, isSelected, isBooked }: { label: string; isSelected: boolean; isBooked: boolean }) => (
+    <div className="flex flex-col items-center m-2">
+      <Button
+        variant="outlined" // Change to 'outlined' for the red border
+        disabled={isBooked}
+        onClick={() => handleSeatClick(label)}
+        sx={{
+          backgroundColor: isBooked ? 'grey' : isSelected ? 'rgba(248, 68, 100, 1)' : 'white', // White background when not selected
+          borderColor: isBooked ? 'red' : 'grey', // Red border
+          color: isBooked ? 'white' : isSelected ? 'white' : 'black', // Text color based on state
+          '&:hover': {
+            backgroundColor: isBooked ? 'darkred' : isSelected ? 'rgba(248, 68, 100, 1)' : 'rgba(255, 0, 0, 0.1)', // Light red background on hover if not booked
+          },
+          width: '40px',
+          height: '40px',
+          padding: '10px',
+          marginLeft: '10px'
+        }}
+      >
+        <ArmchairIcon/>
+      </Button>
+      {/* <Typography variant="caption" sx={{ color: isBooked ? 'red' : 'black' }}>
+        {isBooked ? '' : isSelected ? '' : ''}
+      </Typography> */}
     </div>
+  );
+  
+  return (
+    
+    <Box sx={{ p: 4 }}>
+      <div className={styles.headercontainer}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        {movieName}
+      </Typography>
+      <Typography variant="h6" gutterBottom>
+        {theaterName} - {theaterPlace}
+      </Typography>
+      <Typography variant="body1" gutterBottom>
+        {formatDate(selectedDate)} - {Object.values(selectedTimes).join(', ')}
+      </Typography>
+      {/* <Typography variant="body1" gutterBottom>
+        Time: {Object.values(selectedTimes).join(', ')}
+      </Typography> */}
+      <Typography variant="h6" gutterBottom>
+        Selected Seats: {Array.from(selectedSeats).join(', ') || 'None'}
+      </Typography>
+     
+      </div>
+      <div className={styles.mainscreenconatiner}>
+        <div className={styles.screenContainer}>
+          <p className={styles.allEyesThisWay}>All eyes this way</p>
+        </div>
+      </div>
+      <div className={styles.seatContainer}>
+      <Box display="flex" flexDirection="column" alignItems="center">
+        {seatLayout.map((row, rowIndex) => (
+          <Box key={rowIndex} display="flex" justifyContent="center" mb={1}>
+            {row.map((seatLabel) => {
+              const isBooked = bookedSeats.has(seatLabel);
+              const isSelected = selectedSeats.has(seatLabel);
+              return <SeatIcon key={seatLabel} label={seatLabel} isSelected={isSelected} isBooked={isBooked} />;
+            })}
+          </Box>
+        ))}
+      </Box>
+      </div>
+      <div className={styles.priceContainer}>
+        <div className={styles.subpriceContainer}>
+          <Typography variant="h6" gutterBottom>
+            Total Cost: ₹{totalCost}
+          </Typography>
+        </div>
+      </div>
+      <div className={styles.btncontainer}>
+      
+      <Button
+        variant="contained"
+        onClick={handleBookSeats}
+        disabled={selectedSeats.size === 0}
+        sx={{
+          marginTop: 2,
+          backgroundColor: '#4CAF50',
+          '&:hover': {
+            backgroundColor: '#388E3C',
+          },
+        }}
+      >
+        Book Seats
+      </Button>
+      </div>
+    </Box>
   );
 };
 

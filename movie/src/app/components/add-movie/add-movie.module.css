@@ -1,215 +1,305 @@
 .add_movie_form {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .title {
-    font-size: 30px;
-    color: #3d2358;
-    text-align: center;
-    align-items: center;
-    font-family: Impact, Charcoal, sans-serif;
-    text-shadow: 0px 0px 0 rgb(-45,-45,0),
-                 0px -1px  0 rgb(-223,-223,0),
-                 0px -2px 1px rgba(0,0,0,0),
-                 0px -2px 1px rgba(0,0,0,0.5),
-                 0px 0px 1px rgba(0,0,0,.2);
-  }
-  
-  .field {
-    margin-bottom: 15px;
-  }
-  
-  .input,
-  .textarea,
-  .select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    color: #333;
-    font-size: 16px;
-    background-color: #dadfe1;
-  }
-  
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
 
-  .invalid {
-    border: 2px solid red;
-  }
+.title {
+  font-size: 2rem;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  font-family: system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.025em;
+}
 
-    
-  .input:focus,
-  .textarea:focus,
-  .select:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  
-  .error {
-    border-color: #dc3545;
-  }
-  
-  .errorText {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
-  }
-  
-  .textarea {
-    height: 100px;
-    resize: vertical;
-  }
-  
-  .select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M8 12L1 5h14z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
-  }
-  
-  .checkbox {
-    margin-right: 10px;
-  }
-  
-  .button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-  }
-  
-  .button:hover {
-    background-color: #0056b3;
-  }
-  
-  .button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-  
+.field {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
 
-  
-  .card {
-    background-color: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .moviePoster {
-    width: 100%;
-    height: 225px;
-    object-fit: cover;
-  }
-  
-  .cardTitle {
-    padding: 10px;
-    font-size: 14px;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .selectedMovie {
-    background-color: #e9ecef;
-    padding: 15px;
-    border-radius: 4px;
-    margin-top: 20px;
-  }
-  
-  .selectedMovieTitle {
-    margin-top: 0;
-    color: #333;
-  }
-  
-  .selectedMovieDescription {
-    font-size: 14px;
-    color: #666;
+.input,
+.textarea,
+.select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 0.95rem;
+  background-color: #f9fafb;
+  transition: all 0.2s ease-in-out;
+}
+
+.input:hover,
+.textarea:hover,
+.select:hover {
+  border-color: #d1d5db;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: #ffffff;
+}
+
+.invalid {
+  border-color: #ef4444;
+}
+
+.invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+}
+
+.checkbox {
+  margin-right: 0.75rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
+.button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.button:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+}
+
+.moviePoster {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+
+.cardTitle {
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  color: #374151;
+}
+
+.selectedMovie {
+  background-color: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border: 1px solid #e5e7eb;
+}
+
+.selectedMovieTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+}
+
+.selectedMovieDescription {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.banner {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.imagePreview {
+  margin: 1rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.previewImg {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.castList {
+  background-color: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.castList h4 {
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.castList ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.castList li {
+  padding: 0.5rem;
+  background-color: #ffffff;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.castPhotosPreviews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.castPhotoPreview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.removePhotoButton {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background-color: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.removePhotoButton:hover {
+  background-color: #dc2626;
+}
+
+.submitButton {
+  width: 100%;
+  background-color: #10b981;
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitButton:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .add_movie_form {
+    padding: 1rem;
+    margin: 1rem;
   }
 
   .gridContainer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-  }
-  
-  .card {
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    overflow: hidden;
-    width: 150px; /* Adjust as necessary */
-  }
-  
-  .moviePoster {
-    width: 100%;
-    height: auto;
-  }
-  
-  .selectedMovie {
-    margin-top: 20px;
-  }
-  
-  .selectedMovieTitle {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-  }
-  
-  .selectedMovieDescription {
-    font-size: 1rem;
-    margin-bottom: 15px;
-  }
-  
-  .banner {
-    position: relative;
-    width: 100%;
-    height: 300px; /* Adjust as necessary */
-    overflow: hidden;
-    margin-top: 10px;
-  }
-  
-  .bannerImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* This will ensure the image covers the area nicely */
-    border-radius: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
   }
 
-  .submitButton{
-    padding: 12px 22px;
-    background-color: #45e04ae1;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
+  .moviePoster {
+    height: 200px;
   }
-  .submitButton:hover{
-    background-color: #0ee415;
-    box-shadow: #666;
+
+  .banner {
+    height: 200px;
   }
-  
-  @media (max-width: 600px) {
-    .add_movie_form {
-      padding: 15px;
-    }
-  
-    .gridContainer {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
+
+  .field {
+    margin-bottom: 1rem;
   }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+}

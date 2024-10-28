@@ -1,4 +1,3 @@
-
 // 'use client'
 // import { useEffect, useState } from 'react';
 // import { getAllMovies, addShows } from '@/app/api-helpers/api-helpers.js';
@@ -9,8 +8,8 @@
 //   _id: string;
 //   name: string;
 //   location: string;
-//   seatLayout: number[];
-//   showtimes: { time: string; _id: string }[];
+//   seatLayout: number[]; 
+//   showtimes: { time: string; _id: string }[]; 
 // }
 
 // interface Movie {
@@ -28,11 +27,14 @@
 //   const [dates, setDates] = useState<string[]>([]);
 //   const [selectedTimes, setSelectedTimes] = useState<Set<string>>(new Set());
 //   const [movieDetails, setMovieDetails] = useState<Movie | null>(null);
+//   const [showtimes, setShowtimes] = useState<{ time: string; _id: string }[]>([]);
 
 //   useEffect(() => {
 //     const theaterData = localStorage.getItem('selectedTheater');
 //     if (theaterData) {
-//       setTheater(JSON.parse(theaterData));
+//       const theaterInfo = JSON.parse(theaterData);
+//       setTheater(theaterInfo);
+//       setShowtimes(theaterInfo.showtimes || []); // Set showtimes from theater data
 //       localStorage.removeItem('selectedTheater');
 //     }
 
@@ -73,7 +75,6 @@
 //         posterUrl, // Add the poster URL to the form data
 //       };
 
-//       console.log(formData)
 
 //       await addShows(formData);
 //       Swal.fire({
@@ -110,6 +111,11 @@
 //       newTimes.add(time);
 //     }
 //     setSelectedTimes(newTimes);
+//   };
+
+//   const getTodayDate = () => {
+//     const today = new Date();
+//     return today.toISOString().split('T')[0];
 //   };
 
 //   return (
@@ -206,8 +212,8 @@
 //             {/* Time Selection */}
 //             <div style={{ marginBottom: '20px' }}>
 //               <label style={{ fontSize: '16px' }}>Select Times:</label>
-//               {['10:00 AM', '1:00 PM', '4:00 PM', '7:00 PM'].map((time) => (
-//                 <div key={time} style={{ marginBottom: '10px' }}>
+//               {showtimes.map(({ time, _id }) => (
+//                 <div key={_id} style={{ marginBottom: '10px' }}>
 //                   <input
 //                     type="checkbox"
 //                     checked={selectedTimes.has(time)}
@@ -242,6 +248,8 @@
 // };
 
 // export default AddShows;
+
+
 'use client'
 import { useEffect, useState } from 'react';
 import { getAllMovies, addShows } from '@/app/api-helpers/api-helpers.js';
@@ -358,6 +366,12 @@ const AddShows = () => {
     setSelectedTimes(newTimes);
   };
 
+  // Helper function to get today's date in 'YYYY-MM-DD' format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
   return (
     <div style={{ display: 'flex', padding: '20px', maxWidth: '1200px', margin: 'auto', gap: '20px' }}>
       {/* Movie Details Card */}
@@ -366,7 +380,7 @@ const AddShows = () => {
           <CardMedia
             component="img"
             height={350}
-            image={`http://localhost:5000/uploads/${movieDetails.posterUrl.split('\\').pop()}`}
+            image={`https://movie-booking-nextjs.onrender.com/uploads/${movieDetails.posterUrl.split('\\').pop()}`}
             alt={movieDetails.title}
           />
           <CardContent>
@@ -417,6 +431,7 @@ const AddShows = () => {
                     type="date"
                     value={date}
                     onChange={(e) => handleDateChange(index, e.target.value)}
+                    min={getTodayDate()}  // Disable dates before today
                     style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', marginRight: '10px', width: '70%' }}
                   />
                   <button

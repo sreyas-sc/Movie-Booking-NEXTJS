@@ -6,6 +6,69 @@ Define your seat styles here
   color: black;
   margin: 4px;
 }
+.priceContainer{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainscreenconatiner{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screenContainer {
+  height: 10px;
+  width: 90%;
+  background-color: rgb(50, 50, 50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+  /* Curving effect from the center */
+  border-radius: 50% 50% 0 0; /* Only the bottom edges are curved */
+  transform: scaleY(2); /* Controls how deep the curve appears */
+  position: relative;
+}
+.allEyesThisWay{
+  color: aliceblue;
+  font-size: 10px;
+}
+
+.seatContainer{
+  /* min-width: fit-content; */
+  max-width: 100%;
+  overflow-y: auto;
+  /* background-color: aquamarine; */
+}
+.subpriceContainer{
+  width: fit-content;
+  padding: 10px 20px;
+  display: flex;
+  border-radius: 15px;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5px;
+  margin-top: 20px;
+}
+
+.headercontainer{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  flex-direction: column;
+}
+
+.btncontainer{
+  width: 100%;
+  /* background-color: blue; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
 
 .disabled {
   background-color: gray;
