@@ -4,7 +4,7 @@ import { Typography, Button, Box } from '@mui/material';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 import { useRouter } from "next/navigation";
-import { Armchair, ArmchairIcon } from 'lucide-react';
+import { ArmchairIcon } from 'lucide-react';
 import { checkSeatAvailability } from '@/app/api-helpers/api-helpers.js';
 import styles from './seat.module.css'
 
@@ -34,6 +34,12 @@ interface RazorpayOptions {
   };
   theme: {
     color: string;
+  };
+}
+
+interface RazorpayWindow extends Window {
+  Razorpay: new (options: RazorpayOptions) => {
+    open: () => void;
   };
 }
 
@@ -221,7 +227,9 @@ const SeatSelection = () => {
         },
       };
 
-      const payment = new (window as any).Razorpay(options);
+      // const payment = new (window as any).Razorpay(options);
+      const Razorpay = window as RazorpayWindow;
+      const payment = new Razorpay.Razorpay(options);
       payment.open();
     } catch (error) {
       console.error('Failed to create Razorpay order:', error);

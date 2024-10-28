@@ -1,6 +1,6 @@
 'use client';
 import { getUserBooking, getUserDetails } from '@/app/api-helpers/api-helpers.js';
-import { Box, Card, CardContent, CardHeader,Container,Grid, Typography,Avatar,Paper,Divider,Chip,IconButton,Button,Tab,Tabs,Skeleton,Badge,Stack,
+import { Box, Card, CardContent, CardHeader,Container,Grid, Typography,Avatar,Paper,Divider,Chip,IconButton,Tab,Tabs,Skeleton,Stack,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -30,28 +30,28 @@ interface User {
   email: string;
 }
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
+// interface TabPanelProps {
+//   children?: React.ReactNode;
+//   index: number;
+//   value: number;
+// }
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
+// function TabPanel(props: TabPanelProps) {
+//   const { children, value, index, ...other } = props;
+//   return (
+//     <div
+//       role="tabpanel"
+//       hidden={value !== index}
+//       {...other}
+//     >
+//       {value === index && (
+//         <Box sx={{ p: 3 }}>
+//           {children}
+//         </Box>
+//       )}
+//     </div>
+//   );
+// }
 
 const UserProfile = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -128,9 +128,7 @@ const UserProfile = () => {
           {user.email?.[0]?.toUpperCase() || <AccountCircleIcon fontSize="large" />}
         </Avatar>
         <Box>
-          {/* <Typography variant="h4" gutterBottom>
-            {user.name || 'User Name'}
-          </Typography> */}
+          {/*  */}
           <Typography variant="body1" color="text.secondary">
             {user.email}
           </Typography>

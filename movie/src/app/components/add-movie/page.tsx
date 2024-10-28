@@ -238,7 +238,7 @@ const AddMovie: React.FC = () => {
       <div className={styles.gridContainer}>
       {tmdbMovies.map((movie, index) => (
   <div className={styles.card} key={index} onClick={() => selectTmdbMovie(movie)}>
-    <img
+    <Image
       src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
       alt={movie.title}
       onError={(e) => {
