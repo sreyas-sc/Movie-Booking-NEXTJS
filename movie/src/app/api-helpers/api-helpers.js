@@ -8,7 +8,7 @@ import axios from 'axios'
 export const getAllMovies = async (filters = {}) => {
   try {
     const params = new URLSearchParams(filters);
-    const res = await axios.get(`https://movie-booking-nextjs.onrender.com/movie?${params}`);
+    const res = await axios.get(`http://localhost:5000/movie?${params}`);
 
     if (res.status !== 200) {
       console.log("No Data");
@@ -32,7 +32,7 @@ export const sendUserAuthRequest = async (data, signup) => {
         throw new Error("Missing required fields");
       }
       // Make the API request
-      const res = await axios.post(`https://movie-booking-nextjs.onrender.com/user/${signup ? "signup" : "login"}`, {
+      const res = await axios.post(`http://localhost:5000/user/${signup ? "signup" : "login"}`, {
         phone: signup ? data.phone : "",
         email: data.email,
         password: data.password,
@@ -48,37 +48,67 @@ export const sendUserAuthRequest = async (data, signup) => {
     } catch (err) {
       // Handle errors
       console.error("Error:", err.message);
+
+      // Capture the specific error message from the API response
+    if (err.response && err.response.data && err.response.data.message) {
+      throw new Error(err.response.data.message);
+    } else {
+      throw new Error("An unexpected error occurred.");
+    }
     }
   };
 
 
 
 //**************For admin authentication********************
+  // export const sendAdminAuthRequest = async (data) => {
+  //   if (!data?.email || !data?.password) {
+  //     throw new Error("Email or Password is undefined");
+  //   }
+  //   try {
+  //     const res = await axios.post("http://localhost:5000/admin/login", {
+  //       email: data.email,
+  //       password: data.password,
+  //     });
+  //     if (res.status !== 200 && res.status !== 201 ) {
+  //       console.log("Unexpected error occurred!", res.status);
+  //       return null;
+  //     }  
+  //     return res.data;
+  //   } catch (err) {
+  //     console.log("Error occurred:", err);
+  //     return null; // Return null on error
+  //   }
+  // };
   export const sendAdminAuthRequest = async (data) => {
     if (!data?.email || !data?.password) {
       throw new Error("Email or Password is undefined");
     }
     try {
-      const res = await axios.post("https://movie-booking-nextjs.onrender.com/admin/login", {
+      const res = await axios.post("http://localhost:5000/admin/login", {
         email: data.email,
         password: data.password,
       });
-      if (res.status !== 200 && res.status !== 201 ) {
+      if (res.status !== 200 && res.status !== 201) {
         console.log("Unexpected error occurred!", res.status);
-        return null;
-      }  
+        throw new Error("Unexpected error occurred during authentication."); // Throw an error here
+      }
       return res.data;
     } catch (err) {
       console.log("Error occurred:", err);
-      return null; // Return null on error
+      if (err.response && err.response.data) {
+        throw new Error(err.response.data.message || "An unknown error occurred.");
+      }
+      throw new Error("An unknown error occurred.");
     }
   };
+  
   
 
 // *************Get the details of the movie by the movie id******************
   export const getMovieDetails = async (id) => {
     try {
-      const response = await axios.get(`https://movie-booking-nextjs.onrender.com/movie/${id}`);
+      const response = await axios.get(`http://localhost:5000/movie/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching movie details:', error);
@@ -93,7 +123,7 @@ export const sendUserAuthRequest = async (data, signup) => {
       return;
     }
     try {
-      const response = await axios.get(`https://movie-booking-nextjs.onrender.com/user/bookings/${id}`) 
+      const response = await axios.get(`http://localhost:5000/user/bookings/${id}`) 
       if (response.status !== 200) {
         console.error("Unexpected error: ", res);
         return;
@@ -109,7 +139,7 @@ export const sendUserAuthRequest = async (data, signup) => {
 
   //*******************delete the history***********************
   export const deleteBooking = async(id) =>{
-    const res = await axios.delete(`https://movie-booking-nextjs.onrender.com/booking/${id}`)
+    const res = await axios.delete(`http://localhost:5000/booking/${id}`)
     .catch((err) =>console.log(err));
     if(res.status !== 200){
       return console.log("Unexpected error");
@@ -127,7 +157,7 @@ export const sendUserAuthRequest = async (data, signup) => {
       return;
     }
     try {
-      const res = await axios.get(`https://movie-booking-nextjs.onrender.com/user/${id}`);
+      const res = await axios.get(`http://localhost:5000/user/${id}`);
       if (res.status !== 200) {
         console.error("Unexpected error: ", res);
         return;
@@ -147,7 +177,7 @@ export const addMovie = async (formData) => {
   console.log('Token:', token); // Log the token
 
   try {
-    const res = await axios.post('https://movie-booking-nextjs.onrender.com/movie', formData, {
+    const res = await axios.post('http://localhost:5000/movie', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`,
@@ -169,7 +199,7 @@ export const addMovie = async (formData) => {
 export const addTheater = async (theaterData) => {
   const token = localStorage.getItem("token");
   try {
-    const res = await axios.post('https://movie-booking-nextjs.onrender.com/theatre/add', theaterData, {
+    const res = await axios.post('http://localhost:5000/theatre/add', theaterData, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
@@ -192,7 +222,7 @@ export const getAllTheatres = async (filters = {}) => {
     const params = new URLSearchParams(filters).toString();
     
     // Send GET request to the backend
-    const res = await axios.get(`https://movie-booking-nextjs.onrender.com/theatre?${params}`);
+    const res = await axios.get(`http://localhost:5000/theatre?${params}`);
     // Check response status
     if (res.status !== 200) {
       console.log("No Data");
@@ -233,7 +263,7 @@ export const addShowtimesToTheater = async (theaterName, movieIds) => {
 // ****************add shows to theatres*********************
 export const addShows = async (formData) => {
   try {
-    const res = await axios.post('https://movie-booking-nextjs.onrender.com/show/addshow', formData, {
+    const res = await axios.post('http://localhost:5000/show/addshow', formData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -252,7 +282,7 @@ export const addShows = async (formData) => {
 // *************get all the shows(Showss in theatres)**************
 export const getAllShows = async () => {
   try {
-    const res = await axios.get(`https://movie-booking-nextjs.onrender.com/show/getallshows`);
+    const res = await axios.get(`http://localhost:5000/show/getallshows`);
     if (res.status !== 200) {
       console.log("No Data");
       return;
@@ -270,7 +300,7 @@ export const getAllShows = async () => {
 export const googleSignIn = async (email) => {
   try {
     // Make a POST request to the /google-signin endpoint with the email
-    const response = await axios.post('https://movie-booking-nextjs.onrender.com/user/google-signin', { email });
+    const response = await axios.post('http://localhost:5000/user/google-signin', { email });
 
     // Check the response status
     if (response.status === 200) {
@@ -290,7 +320,7 @@ export const googleSignIn = async (email) => {
 
 // *************delete the show************************
 export const deleteShow = async (showId) => {
-  const response = await fetch(`https://movie-booking-nextjs.onrender.com/show/shows/deleteShow/${showId}`, {
+  const response = await fetch(`http://localhost:5000/show/shows/deleteShow/${showId}`, {
     method: 'DELETE',
   });
    if (!response.ok) {
@@ -306,7 +336,7 @@ export const deleteShow = async (showId) => {
 export const checkSeatAvailability = async ({ movieId, theaterId, date, time }) => {
   try {
     // Send a POST request to fetch booked seats for the specified show
-    const res = await axios.post(`https://movie-booking-nextjs.onrender.com/booking/fetch-seats`, {
+    const res = await axios.post(`http://localhost:5000/booking/fetch-seats`, {
       movieId,
       theaterId,
       date,

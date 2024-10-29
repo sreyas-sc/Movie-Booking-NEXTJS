@@ -89,7 +89,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
       const { email } = decoded;
 
       try {
-        await axios.post("https://movie-booking-nextjs.onrender.com/user/send-otp", { email });
+        await axios.post("http://localhost:5000/user/send-otp", { email });
         const response = await googleSignIn(email);
 
         if (response) {
@@ -119,7 +119,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
         throw new Error("Email or OTP is missing.");
       }
 
-      const response = await axios.post("https://movie-booking-nextjs.onrender.com/user/verify-otp", { email, otp: inputs.otp });
+      const response = await axios.post("http://localhost:5000/user/verify-otp", { email, otp: inputs.otp });
 
       if (response.data.success) {
         sessionStorage.removeItem("googleEmail");
@@ -168,14 +168,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
           signup: isAdmin ? false : isSignup,
         });
 
+        // Handle successful signup
         if (isSignup) {
           setSuccessMessage("Signup Successful! Please sign in to continue.");
           setIsSignup(false); // Switch to sign-in page after signup
         } else {
-          router.push("/components/movies");
+          router.push("/components/movies"); // Redirect on sign in
         }
       } catch (err) {
-        setErrors({ ...errors, general: "Something went wrong!" }); // Set general error
+        // setErrors({ ...errors, general: "Something went wrong!" }); // Set general error
+        if (err instanceof Error) {
+          setErrors((prev) => ({ ...prev, general: err.message || "Login failed. Please try again." }));
+        } else {
+          setErrors((prev) => ({ ...prev, general: "Something went wrong!" }));
+        }
+        
       }
     }
   };
@@ -263,6 +270,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, isAdmin }) => {
               />
               <Typography color="error">{errors.password}</Typography>
             </FormControl>
+
+            {errors.general && (
+              <Typography color="error" textAlign="center" marginBottom={2}>
+                {errors.general}
+              </Typography>
+            )}
 
             <Button
               type="submit"

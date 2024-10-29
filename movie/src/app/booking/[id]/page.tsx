@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -7,12 +7,12 @@ import {
   CardContent,
   Divider,
   Button,
-  CardMedia,
   Container,
   Grid,
   Paper,
   Stack,
-  CircularProgress
+  CircularProgress,
+  Tooltip
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import { getMovieDetails, getAllShows } from '@/app/api-helpers/api-helpers.js';
@@ -21,6 +21,8 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StarIcon from '@mui/icons-material/Star';
 import GroupIcon from '@mui/icons-material/Group';
+import MovieIcon from '@mui/icons-material/Movie';
+import Image from 'next/image';
 
 interface Movie {
   releaseDate: string | number | Date;
@@ -48,6 +50,45 @@ interface Show {
   dates: string[];
   times: string[];
 }
+
+const NoShowsAvailable = () => (
+  <Box
+    display="flex"
+    flexDirection="column"
+    alignItems="center"
+    justifyContent="center"
+    py={8}
+    px={4}
+    textAlign="center"
+  >
+    <MovieIcon 
+      sx={{ 
+        fontSize: 120, 
+        color: 'rgba(248, 68, 100, 0.2)',
+        mb: 4
+      }} 
+    />
+    <Typography 
+      variant="h5" 
+      component="h2" 
+      gutterBottom
+      sx={{ 
+        color: 'text.primary',
+        fontWeight: 'bold'
+      }}
+    >
+      No Shows Available
+    </Typography>
+    <Typography 
+      variant="body1" 
+      color="text.secondary"
+      sx={{ maxWidth: '600px' }}
+    >
+      We&apos;re sorry, but there are currently no shows scheduled for this movie. 
+      Please check back later or explore other movies.
+    </Typography>
+  </Box>
+);
 
 const Booking: React.FC = () => {
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -100,6 +141,20 @@ const Booking: React.FC = () => {
     setGroupedShows(grouped);
   }, [shows, id]);
 
+  const isTimeAvailable = (time: string, currentDate: boolean): boolean => {
+    if (!currentDate) return true;
+    
+    const now = new Date();
+    const [hours, minutes] = time.split(':').map(Number);
+    const showTime = new Date();
+    showTime.setHours(hours, minutes, 0);
+    
+    const bufferTime = 30;
+    const bookingDeadline = new Date(showTime.getTime() - bufferTime * 60000);
+    
+    return now < bookingDeadline;
+  };
+
   const handleDateClick = (date: string, theaterKey: string) => {
     const isoDate = new Date(date).toISOString().split('T')[0];
     const selectedShows = groupedShows[theaterKey]?.filter(show =>
@@ -132,6 +187,24 @@ const Booking: React.FC = () => {
     }
   };
 
+  const isCurrentDate = (date: string): boolean => {
+    const today = new Date();
+    const checkDate = new Date(date);
+    return (
+      today.getDate() === checkDate.getDate() &&
+      today.getMonth() === checkDate.getMonth() &&
+      today.getFullYear() === checkDate.getFullYear()
+    );
+  };
+
+  const isPastDate = (date: string): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    return checkDate < today;
+  };
+
   if (!movie) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -147,190 +220,220 @@ const Booking: React.FC = () => {
         mb: 4,
         color: 'primary.main'
       }}>
-         {movie.title}
+        {movie.title}
       </Typography>
 
       <Grid container spacing={4} sx={{ mb: 6 }}>
-        {/* Movie Poster */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ 
-            borderRadius: 2,
-            overflow: 'hidden',
-            height: '100%'
-          }}>
-            <CardMedia
-              component="img"
-              image={movie.posterUrl ? `https://movie-booking-nextjs.onrender.com/uploads/${movie.posterUrl.split('\\').pop()}` : '/placeholder.jpg'}
+      <Grid item xs={12} md={4}>
+        <Card sx={{ height: '100%' }}>
+          <Box sx={{ height: 400, overflow: 'hidden' }}>
+            <Image 
+            width={400}
+            height={600}
+              src={movie.posterUrl ? `http://localhost:5000/uploads/${movie.posterUrl.split('\\').pop()}` : '/placeholder.jpg'}
+              // src={movie.posterUrl || '/9318694.jpg'} // Add a placeholder for fallback
               alt={movie.title}
-              sx={{ 
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover'
-              }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} // Maintain aspect ratio
             />
-          </Paper>
-        </Grid>
+          </Box>
+        </Card>
+      </Grid>
 
-        {/* Movie Details */}
-        <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ 
-            height: '100%',
-            borderRadius: 2,
-            backgroundColor: 'background.paper'
-          }}>
+        <Grid item xs={12} md={8}>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
-              <Stack spacing={3}>
-                <Box>
-                  <Typography variant="h5" gutterBottom fontWeight="bold">
-                    {movie.title}
-                  </Typography>
-                  <Box display="flex" alignItems="center" gap={1} mb={2}>
-                    <StarIcon sx={{ color: 'warning.main' }} />
-                    <Typography variant="subtitle1">
-                      {movie.rating} IMDB Rating
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Typography variant="body1" color="text.secondary">
-                  {movie.description}
-                </Typography>
-
-                <Stack spacing={2}>
+              <Typography variant="h5" gutterBottom>
+                Movie Details
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <CalendarTodayIcon color="primary" />
-                    <Typography variant="body1">
+                    <Typography>
                       Release Date: {new Date(movie.releaseDate).toLocaleDateString()}
                     </Typography>
                   </Box>
-
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <StarIcon color="primary" />
+                    <Typography>
+                      Rating: {movie.rating}/10
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <GroupIcon color="primary" />
-                    <Typography variant="body1">
+                    <Typography>
                       Cast: {movie.cast}
                     </Typography>
                   </Box>
-                </Stack>
-              </Stack>
+                </Grid>
+                {movie.description && (
+                  <Grid item xs={12}>
+                    <Typography variant="body1" color="text.secondary">
+                      {movie.description}
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Theater Selection */}
-      <Box sx={{ mb: 4 }}>
+      {Object.keys(groupedShows).length === 0 ? (
         <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-          {Object.entries(groupedShows).map(([theaterKey, shows]) => (
-            <Card key={theaterKey} sx={{ mb: 3, borderRadius: 2 }}>
-              <CardContent>
-                <Box mb={3}>
-                  <Typography variant="h6" gutterBottom>
-                    {theaterKey.split('-')[1]}
-                  </Typography>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <LocationOnIcon color="primary" fontSize="small" />
-                    <Typography variant="body2" color="text.secondary">
-                      {theaterKey.split('-')[2]}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Divider sx={{ my: 2 }} />
-
-                {/* Dates */}
-                <Box mb={3}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    Select Date
-                  </Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    {shows.flatMap(show => show.dates).map(date => {
-                      const isPastDate = new Date(date) < new Date(); // Check if the date is in the past
-                      return (
-                        <Button
-                          key={date}
-                          variant={selectedDate === date && selectedTheater === theaterKey ? "contained" : "outlined"}
-                          size="small"
-                          onClick={() => handleDateClick(date, theaterKey)}
-                          disabled={isPastDate} // Disable button for past dates
-                          sx={{
-                            mb: 1,
-                            color: "rgba(248, 68, 100, 1)",
-                            minWidth: '100px',
-                            backgroundColor: isPastDate ? "lightgray" : "white", // Change color for past dates
-                            borderColor: "rgba(248, 68, 100, 1)",
-                            '&:hover': {
-                              backgroundColor: isPastDate ? "lightgray" : "rgba(248, 68, 100, 0.9)",
-                              color: isPastDate ? "black" : "white"
-                            }
-                          }}
-                          startIcon={<CalendarTodayIcon />}
-                        >
-                          {new Date(date).toLocaleDateString()}
-                        </Button>
-                      );
-                    })}
-                  </Stack>
-                </Box>
-
-                {/* Times */}
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    Select Showtime
-                  </Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    {(groupedShows[theaterKey]?.[0]?.times || []).map(time => (
-                      <Button
-                        key={time}
-                        variant={selectedTimes[theaterKey] === time ? "contained" : "outlined"}
-                        size="small"
-                        onClick={() => handleTimeClick(time, theaterKey)}
-                        sx={{
-                          mb: 1,
-                          color: "rgba(248, 68, 100, 1)",
-                          minWidth: '100px',
-                          backgroundColor: "white",
-                          borderColor: "rgba(248, 68, 100, 1)",
-                          '&:hover': {
-                            backgroundColor: "rgba(248, 68, 100, 0.9)",
-                            color: "black"
-                          }
-                        }}
-                        startIcon={<AccessTimeIcon />}
-                      >
-                        {time}
-                      </Button>
-                    ))}
-                  </Stack>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+          <NoShowsAvailable />
         </Paper>
-      </Box>
+      ) : (
+        <Box sx={{ mb: 4 }}>
+          <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+            {Object.entries(groupedShows).map(([theaterKey, shows]) => (
+              <Card key={theaterKey} sx={{ mb: 3, borderRadius: 2 }}>
+                <CardContent>
+                  <Box mb={3}>
+                    <Typography variant="h6" gutterBottom>
+                      {theaterKey.split('-')[1]}
+                    </Typography>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <LocationOnIcon color="primary" fontSize="small" />
+                      <Typography variant="body2" color="text.secondary">
+                        {theaterKey.split('-')[2]}
+                      </Typography>
+                    </Box>
+                  </Box>
 
-      {/* Proceed to Book */}
-      <Box textAlign="center">
-        <Button
-          onClick={handleProceedToBook}
-          variant="contained"
-          color="primary"
-          disabled={!selectedDate || !selectedTheater || !selectedTimes[selectedTheater]}
-          sx={{
-            py: 1.5,
-            px: 4,
-            fontWeight: "bold",
-            fontSize: "1.2rem",
-            backgroundColor: "rgba(248, 68, 100, 1)",
-            color: "white",
-            borderRadius: "8px",
-            "&:hover": {
-              backgroundColor: "rgba(248, 68, 100, 0.9)"
-            }
-          }}
-        >
-          Proceed to Book
-        </Button>
-      </Box>
+                  <Divider sx={{ my: 2 }} />
+
+                  <Box mb={3}>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Select Date
+                    </Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                      {shows.flatMap(show => show.dates).map(date => {
+                        const isToday = isCurrentDate(date);
+                        const isPast = isPastDate(date);
+                        
+                        return (
+                          <Tooltip 
+                            title={isPast ? "Past date" : isToday ? "Today's shows" : ""} 
+                            key={date}
+                          >
+                            <span>
+                              <Button
+                                variant={selectedDate === date && selectedTheater === theaterKey ? "contained" : "outlined"}
+                                size="small"
+                                onClick={() => handleDateClick(date, theaterKey)}
+                                disabled={isPast}
+                                sx={{
+                                  mb: 1,
+                                  minWidth: '120px',
+                                  color: selectedDate === date ? "white" : "rgba(248, 68, 100, 1)",
+                                  backgroundColor: selectedDate === date ? "rgba(248, 68, 100, 1)" : "white",
+                                  borderColor: "rgba(248, 68, 100, 1)",
+                                  '&:hover': {
+                                    backgroundColor: "rgba(248, 68, 100, 0.9)",
+                                    color: "white"
+                                  },
+                                  '&.Mui-disabled': {
+                                    backgroundColor: '#f5f5f5',
+                                    color: '#bdbdbd'
+                                  }
+                                }}
+                                startIcon={<CalendarTodayIcon />}
+                              >
+                                {isToday ? "Today" : new Date(date).toLocaleDateString()}
+                              </Button>
+                            </span>
+                          </Tooltip>
+                        );
+                      })}
+                    </Stack>
+                  </Box>
+
+                  {selectedDate && selectedTheater === theaterKey && (
+                    <Box>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Select Showtime
+                      </Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        {(groupedShows[theaterKey]?.[0]?.times || []).map(time => {
+                          const isToday = isCurrentDate(selectedDate);
+                          const available = isTimeAvailable(time, isToday);
+                          
+                          return (
+                            <Tooltip 
+                              title={!available ? "Booking closed for this show" : ""} 
+                              key={time}
+                            >
+                              <span>
+                                <Button
+                                  variant={selectedTimes[theaterKey] === time ? "contained" : "outlined"}
+                                  size="small"
+                                  onClick={() => handleTimeClick(time, theaterKey)}
+                                  disabled={!available}
+                                  sx={{
+                                    mb: 1,
+                                    minWidth: '100px',
+                                    color: selectedTimes[theaterKey] === time ? "white" : "rgba(248, 68, 100, 1)",
+                                    backgroundColor: selectedTimes[theaterKey] === time ? "rgba(248, 68, 100, 1)" : "white",
+                                    borderColor: "rgba(248, 68, 100, 1)",
+                                    '&:hover': {
+                                      backgroundColor: "rgba(248, 68, 100, 0.9)",
+                                      color: "white"
+                                    },
+                                    '&.Mui-disabled': {
+                                      backgroundColor: '#f5f5f5',
+                                      color: '#bdbdbd'
+                                    }
+                                  }}
+                                  startIcon={<AccessTimeIcon />}
+                                >
+                                  {time}
+                                </Button>
+                              </span>
+                            </Tooltip>
+                          );
+                        })}
+                      </Stack>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </Paper>
+        </Box>
+      )}
+
+      {Object.keys(groupedShows).length > 0 && (
+        <Box textAlign="center">
+                <Button
+                  onClick={handleProceedToBook}
+                  variant="contained"
+                  disabled={!selectedDate || !selectedTheater || !selectedTimes[selectedTheater]}
+                  sx={{
+                    py: 1.5,
+                    px: 4,
+                    fontWeight: "bold",
+                    fontSize: "1.2rem",
+                    backgroundColor: "rgba(248, 68, 100, 1)",
+                    color: "white",
+                    borderRadius: "8px",
+                    "&:hover": {
+                      backgroundColor: "rgba(248, 68, 100, 0.9)"
+                    },
+                    "&.Mui-disabled": {
+                      backgroundColor: "#f5f5f5",
+                      color: "#bdbdbd"
+                    }
+                  }}
+                >
+                  Proceed to Book
+                </Button>
+              </Box>
+      )}
     </Container>
   );
 };

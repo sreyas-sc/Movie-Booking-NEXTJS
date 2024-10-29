@@ -30,29 +30,6 @@ interface User {
   email: string;
 }
 
-// interface TabPanelProps {
-//   children?: React.ReactNode;
-//   index: number;
-//   value: number;
-// }
-
-// function TabPanel(props: TabPanelProps) {
-//   const { children, value, index, ...other } = props;
-//   return (
-//     <div
-//       role="tabpanel"
-//       hidden={value !== index}
-//       {...other}
-//     >
-//       {value === index && (
-//         <Box sx={{ p: 3 }}>
-//           {children}
-//         </Box>
-//       )}
-//     </div>
-//   );
-// }
-
 const UserProfile = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [user, setUser] = useState<User>({} as User);
@@ -112,6 +89,18 @@ const UserProfile = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const filterBookings = () => {
+    const today = new Date();
+    if (selectedTab === 1) {
+      // Upcoming Bookings
+      return bookings.filter((booking) => new Date(booking.date) >= today);
+    } else if (selectedTab === 2) {
+      // Past Bookings
+      return bookings.filter((booking) => new Date(booking.date) < today);
+    }
+    return bookings; // All Bookings
   };
 
   const UserProfileSection = () => (
@@ -334,7 +323,7 @@ const UserProfile = () => {
 
           {viewType === 0 ? (
             <Grid container spacing={3}>
-              {bookings.map((booking) => (
+              {filterBookings().map((booking) => (
                 <Grid item xs={12} sm={6} md={4} key={booking._id}>
                   <BookingCard booking={booking} />
                 </Grid>
@@ -342,7 +331,7 @@ const UserProfile = () => {
             </Grid>
           ) : (
             <Box>
-              {bookings.map((booking) => (
+              {filterBookings().map((booking) => (
                 <BookingList key={booking._id} booking={booking} />
               ))}
             </Box>

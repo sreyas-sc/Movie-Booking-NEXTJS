@@ -152,7 +152,7 @@ const SeatSelection = () => {
 
   const proceedBooking = async () => {
     try {
-      const response = await fetch('https://movie-booking-nextjs.onrender.com/booking/razorpay', {
+      const response = await fetch('http://localhost:5000/booking/razorpay', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ const SeatSelection = () => {
         order_id: data.orderId,
         handler: async (response: RazorpayPaymentResponse) => {
           console.log('Payment successful!');
-          const bookingResponse = await fetch('https://movie-booking-nextjs.onrender.com/booking/book', {
+          const bookingResponse = await fetch('http://localhost:5000/booking/book', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -261,54 +261,40 @@ const SeatSelection = () => {
 
   const { name: theaterName, place: theaterPlace } = getTheaterDetails(selectedTheater);
 
-  // const SeatIcon = ({ label, isSelected, isBooked }: { label: string; isSelected: boolean; isBooked: boolean }) => (
-  //   <div className="flex flex-col items-center m-2">
-  //     <Button
-  //       variant="contained"
-  //       disabled={isBooked}
-  //       onClick={() => handleSeatClick(label)}
-  //       sx={{
-  //         backgroundColor: isBooked ? 'red' : isSelected ? 'green' : '#1976d2',
-  //         color: 'white',
-  //         '&:hover': {
-  //           backgroundColor: isBooked ? 'darkred' : isSelected ? 'darkgreen' : '#1565c0',
-  //         },
-  //         width: '40px',
-  //         height: '40px',
-  //       }}
-  //     >
-  //       {/* {label} */}
-  //       <ArmchairIcon/>
-  //     </Button>
-  //     <Typography variant="caption" sx={{ color: isBooked ? 'red' : 'black' }}>
-  //       {isBooked ? 'Booked' : isSelected ? 'Selected' : 'Available'}
-  //     </Typography>
-  //   </div>
-  // );
+  
   const SeatIcon = ({ label, isSelected, isBooked }: { label: string; isSelected: boolean; isBooked: boolean }) => (
     <div className="flex flex-col items-center m-2">
       <Button
-        variant="outlined" // Change to 'outlined' for the red border
+        variant="outlined" 
         disabled={isBooked}
         onClick={() => handleSeatClick(label)}
         sx={{
-          backgroundColor: isBooked ? 'grey' : isSelected ? 'rgba(248, 68, 100, 1)' : 'white', // White background when not selected
-          borderColor: isBooked ? 'red' : 'grey', // Red border
-          color: isBooked ? 'white' : isSelected ? 'white' : 'black', // Text color based on state
+          backgroundColor: isBooked ? 'grey' : isSelected ? 'rgba(248, 68, 100, 1)' : 'white',
+          borderColor: isBooked ? 'red' : 'grey',
+          color: isBooked ? 'white' : isSelected ? 'white' : 'black',
           '&:hover': {
-            backgroundColor: isBooked ? 'darkred' : isSelected ? 'rgba(248, 68, 100, 1)' : 'rgba(255, 0, 0, 0.1)', // Light red background on hover if not booked
+            backgroundColor: isBooked ? 'darkred' : isSelected ? 'rgba(248, 68, 100, 1)' : 'rgba(255, 0, 0, 0.1)',
           },
-          width: '40px',
-          height: '40px',
-          padding: '10px',
+          width: {
+            xs: '30px', // Small screens
+            sm: '35px', // Medium screens
+            md: '40px', // Large screens
+          },
+          height: {
+            xs: '30px', // Small screens
+            sm: '35px', // Medium screens
+            md: '40px', // Large screens
+          },
+          padding: {
+            xs: '8px',
+            sm: '9px',
+            md: '10px',
+          },
           marginLeft: '10px'
         }}
       >
-        <ArmchairIcon/>
+        <ArmchairIcon />
       </Button>
-      {/* <Typography variant="caption" sx={{ color: isBooked ? 'red' : 'black' }}>
-        {isBooked ? '' : isSelected ? '' : ''}
-      </Typography> */}
     </div>
   );
   

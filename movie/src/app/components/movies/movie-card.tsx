@@ -43,7 +43,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
   };
 
   const imageUrl = posterUrl 
-    ? `https://movie-booking-nextjs.onrender.com/uploads/${posterUrl.split('\\').pop()}` 
+    ? `http://localhost:5000/uploads/${posterUrl.split('\\').pop()}` 
     : '/default-image.jpg';
 
   return (
@@ -68,6 +68,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
         <CardMedia
           component="img"
           height={400}
+          width={400}
           image={imageUrl}
           alt={title}
           sx={{
@@ -185,6 +186,8 @@ const MovieCard: React.FC<MovieCardProps> = ({
                     <Image
                       src={imageUrl}
                       alt={title}
+                      width={400}
+                      height={600}
                       style={{
                         width: '100%',
                         height: 'auto',
@@ -203,6 +206,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
                   <Grid container spacing={2}>
                     {cast && cast.length > 0 ? (
                       cast.map((member, index) => (
+
                         <Grid item xs={6} sm={4} key={index}>
                           <Box sx={{ 
                             display: 'flex', 
@@ -212,7 +216,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
                           }}>
                             {castPhotos && castPhotos[index] ? (
                               <Image
-                                src={`https://movie-booking-nextjs.onrender.com/uploads/${castPhotos[index].split('\\').pop()}`}
+                                src={`http://localhost:5000/uploads/${castPhotos[index].split('\\').pop()}`}
                                 alt={member}
                                 width={80}
                                 height={80}
@@ -287,3 +291,5 @@ const MovieCard: React.FC<MovieCardProps> = ({
 };
 
 export default MovieCard;
+
+

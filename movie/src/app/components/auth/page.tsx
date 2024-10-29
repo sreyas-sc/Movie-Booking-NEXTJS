@@ -19,7 +19,6 @@ interface AuthResponse {
 const Auth = () => {
   const dispatch = useDispatch();
 
-  // Modify function to use the AuthResponse type instead of any
   const onResponseReceived = (data: AuthResponse | null) => {
     if (data && data.userId) {
       dispatch(userActions.login());
@@ -29,12 +28,25 @@ const Auth = () => {
     }
   };
 
-  // Modify function to use the AuthData type instead of any
-  const getData = (data: AuthData) => {
-    sendUserAuthRequest(data, data.signup)
-      .then(onResponseReceived)
-      .catch((err) => console.log(err));
+
+  const getData = async (data: AuthData) => {
+    try {
+      const response = await sendUserAuthRequest(data, data.signup);
+      
+      // Ensure the response has the expected structure
+      if (!response || typeof response !== 'object') {
+        throw new Error("Invalid response from authentication service.");
+      }
+      
+      onResponseReceived(response);
+    } catch (err) {
+      // Check if the error is an instance of Error and has a message
+      const errorMessage = (err instanceof Error) ? err.message : "An error occurred during authentication.";
+      throw new Error(errorMessage);
+    }
   };
+  
+  
 
   return (
     <div>
