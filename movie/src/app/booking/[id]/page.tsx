@@ -230,7 +230,7 @@ const Booking: React.FC = () => {
             <Image 
             width={400}
             height={600}
-              src={movie.posterUrl ? `http://localhost:5000/uploads/${movie.posterUrl.split('\\').pop()}` : '/placeholder.jpg'}
+              src={movie.posterUrl ? `https://movie-booking-nextjs.onrender.com/uploads/${movie.posterUrl.split('\\').pop()}` : '/placeholder.jpg'}
               // src={movie.posterUrl || '/9318694.jpg'} // Add a placeholder for fallback
               alt={movie.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} // Maintain aspect ratio

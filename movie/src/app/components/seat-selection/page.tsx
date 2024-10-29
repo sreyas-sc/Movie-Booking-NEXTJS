@@ -152,7 +152,7 @@ const SeatSelection = () => {
 
   const proceedBooking = async () => {
     try {
-      const response = await fetch('http://localhost:5000/booking/razorpay', {
+      const response = await fetch('https://movie-booking-nextjs.onrender.com/booking/razorpay', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ const SeatSelection = () => {
         order_id: data.orderId,
         handler: async (response: RazorpayPaymentResponse) => {
           console.log('Payment successful!');
-          const bookingResponse = await fetch('http://localhost:5000/booking/book', {
+          const bookingResponse = await fetch('https://movie-booking-nextjs.onrender.com/booking/book', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

@@ -43,7 +43,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
   };
 
   const imageUrl = posterUrl 
-    ? `http://localhost:5000/uploads/${posterUrl.split('\\').pop()}` 
+    ? `https://movie-booking-nextjs.onrender.com/uploads/${posterUrl.split('\\').pop()}` 
     : '/default-image.jpg';
 
   return (
@@ -216,7 +216,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
                           }}>
                             {castPhotos && castPhotos[index] ? (
                               <Image
-                                src={`http://localhost:5000/uploads/${castPhotos[index].split('\\').pop()}`}
+                                src={`https://movie-booking-nextjs.onrender.com/uploads/${castPhotos[index].split('\\').pop()}`}
                                 alt={member}
                                 width={80}
                                 height={80}
